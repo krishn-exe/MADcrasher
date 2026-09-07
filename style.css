@@ -26,3 +26,33 @@ body{
     height: 100%;
     background-color: #08082a;
 }
+
+#top, #bottom{
+    position: absolute;
+    color: #e6e660;
+    pointer-events: none;
+    user-select: none;
+}
+
+#top{
+    top: 20px;
+    left: 40px;
+    right: 40px;
+    justify-content: flex-start;
+    gap: 120px;
+    font-size: 14px;
+
+}
+
+#hi-score{
+    display: flex;
+    gap: 16px;
+}
+
+#bottom{
+    bottom: 20px;
+    right: 40px;
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+}
