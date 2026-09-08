@@ -1,8 +1,8 @@
 // Load references to the HTML elements
 
-const playerNameInput = document.getElementById('player-name');
-const startButton = document.getElementById('start-game-btn');
-const highScoreTable = document.getElementById('high-score-list');
+const playerNameInput = document.getElementById('playerName');
+const startButton = document.getElementById('startGameBtn');
+const highScoreTable = document.getElementById('highScoreList');
 
 class Player {
 	constructor(name) {
