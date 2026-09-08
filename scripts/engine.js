@@ -3,7 +3,7 @@
 export class InputManager {
   constructor() {
     this.keysDown = new Set();
-    this.keys = new Set();
+    this.justPressed = new Set();
 
     const blockedKeys = new Set(['KeyA', 'KeyD', 'KeyE', 'Space']);
 
@@ -13,14 +13,14 @@ export class InputManager {
             }
 
             if (!e.repeat) {
-                this.keys.add(e.code);
+                this.justPressed.add(e.code);
             }
             this.keysDown.add(e.code);
         });
 
         window.addEventListener('keyup', (e) => {
             this.keysDown.delete(e.code);
-            this.keys.delete(e.code);
+            this.justPressed.delete(e.code);
         });
     }
 
@@ -29,10 +29,10 @@ export class InputManager {
     }
 
     iskeys(code) {
-        return this.keys.has(code);
+        return this.justPressed.has(code);
     }
 
     update() {
-        this.keys.clear();
+        this.justPressed.clear();
     }
 }
