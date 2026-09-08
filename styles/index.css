@@ -1,0 +1,72 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    background-color: #856A68;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* main menu container styles */
+
+.main-menu-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+}
+
+/* Game title styles */
+
+.game-title h1{
+    font-family: 'Press Start 2P', sans-serif;
+    color: #fff;
+    text-align: center;
+    letter-spacing: 0.1rem;
+}
+
+#mad{
+    padding-top: 20%;
+    font-size: 5rem;
+    color: #3a3ab5;
+    text-shadow: 6px 6px 0 #f8cf17,
+                 12px 12px 0 #f8cf17,
+                 18px 18px 1px #f8cf17;
+    transform: perspective(300px) rotateX(30deg);
+    -webkit-text-stroke: 1px #dbcc6fcf;
+    
+}
+
+#crasher{
+    font-size: 5rem;
+    color: #3a3ab5;
+    text-shadow: 6px 6px 0 #f8cf17,
+                 12px 12px 0 #f8cf17,
+                 18px 18px 1px #f8cf17;
+    transform: perspective(150px) rotateX(15deg);
+    -webkit-text-stroke: 1px #dfd9b241;
+}
+
+/* Container styles */
+
+.container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+}
+
+.high-score{
+    height: 100px;
+    width: 100px;
+    background-color: #3a3ab5;
+}
