@@ -10,6 +10,7 @@ body{
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    min-height: 100vh;
 }
 
 /* main menu container styles */
@@ -28,7 +29,8 @@ body{
 .game-title{
     display:flex;
     flex-direction: column;
-    gap: 3rem;
+    align-items: center;
+    gap: 1rem;
 }
 
 .game-title h1{
@@ -40,7 +42,7 @@ body{
 }
 
 #mad{
-    padding-top: 20%;
+    padding-top: 5%;
     font-size: 5rem;
     color: #3a3ab5;
     text-shadow: 4px 4px 0 #f8cf17,
@@ -68,9 +70,12 @@ body{
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100vh;
+    gap: 5rem;
+    width: 100vw;
+    padding: 2rem 0.5rem;
 }
+
+/*High score table*/
 
 .high-score{
     width: 650px;
@@ -81,8 +86,6 @@ body{
     font-family: 'Press Start 2P', sans-serif;
     box-shadow: 8px 8px 0 #19194a;
     position: relative;
-    top: -150px;
-    left: 400px;
 }
 
 .high-score h2{
@@ -93,7 +96,7 @@ body{
 }
 
 .high-score table{
-    width: 600px;
+    width: 100%;
     border-collapse: collapse;
     font-size: 0.75rem;
     line-height: 0.75rem;
@@ -108,4 +111,45 @@ body{
 .high-score th{
     color: #f8cf17;
     font-size: 0.75rem;
+}
+
+/* Game launcher styles */
+
+.game-launcher{
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    gap: 1rem;
+    width: 600px;
+    height: 100%;
+    padding: 1.5rem;
+    border: 4px solid #f8cf17;
+    background-color: #3a3ab5;
+    color: #fff;
+    font-family: 'Press Start 2P', sans-serif;
+    box-shadow: 8px 8px 0 #19194a;
+    position: relative;
+}
+
+#player-name{
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #f8cf17;
+    background-color: #3a3ab5;
+    color: #fff;
+    font-family: 'Press Start 2P', sans-serif;
+    font-size: 0.75rem;
+}
+
+#start-game-btn{
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #f8cf17;
+    background-color: #fff;
+    color: #000;
+    font-family: 'Press Start 2P', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    cursor: pointer;
 }
