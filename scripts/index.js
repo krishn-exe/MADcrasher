@@ -15,11 +15,7 @@ class Player {
 
 localStorage.setItem('players', JSON.stringify([
 	{ name: 'James bond', highscore: 200 },
-	{ name: 'John Wick', highscore: 184 },
-	{ name: 'Kabir singh', highscore: 146 },
-	{ name: 'Ayush', highscore: 120 },
-	{ name: 'Princy', highscore: 100 },
-	{ name: 'Krishn', highscore: 60 },
+	{ name: 'John Wick', highscore: 300 },
 	{ name: 'Ghost Rider', highscore: 250 },
 ]));
 
