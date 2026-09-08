@@ -17,9 +17,11 @@
   </div>
   <div class = "container">
     <div class = "game-launcher">
+      <form action ="game.html" method="get" id="game-launcher-form">
       <h2>Player Name</h2>
-      <input type="text" id="player-name" placeholder="Enter your name">
-      <button id="start-game-btn">Start Game</button>
+      <input type="text" id="player-name" name="player-name" placeholder="Enter your name" required>
+      <button id="start-game-btn" type="submit">Start Game</button>
+      </form>
     </div>
     <div class = "high-score">
       <h2>High Scores</h2>
@@ -31,36 +33,11 @@
             <th>Score</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>Player 1</td>
-            <td>000000</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Player 2</td>
-            <td>000000</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Player 3</td>
-            <td>000000</td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>Player 4</td>
-            <td>000000</td>
-          </tr>
-          <tr>
-            <td>5</td>
-            <td>Player 5</td>
-            <td>000000</td>
-          </tr>
-        </tbody>
+        <tbody id="high-score-list"></tbody>
       </table>
     </div>
   </div>
   </div>
 </body>
+<script src="scripts/index.js"></script>
 </html>
