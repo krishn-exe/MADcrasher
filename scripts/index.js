@@ -11,19 +11,16 @@ class Player {
 	}
 }
 
-//Temporary placeholder data
 
-localStorage.setItem('players', JSON.stringify([
-	{ name: 'James bond', highscore: 200 },
-	{ name: 'John Wick', highscore: 184 },
-	{ name: 'Kabir singh', highscore: 146 },
-	{ name: 'Ayush', highscore: 120 },
-	{ name: 'Princy', highscore: 100 },
-	{ name: 'Krishn', highscore: 60 },
-	{ name: 'Ghost Rider', highscore: 250 },
-]));
 
-// High score table
+if (!localStorage.getItem('players')) {
+	localStorage.setItem('players', JSON.stringify([
+		{ name: 'James bond', highscore: 200 },
+		{ name: 'John Wick', highscore: 184 },
+		{ name: 'Ghost Rider', highscore: 250 },
+	]));
+}
+
 
 let players = JSON.parse(localStorage.getItem('players')) || [];
 players.sort((a, b) => b.highscore - a.highscore);

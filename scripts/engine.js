@@ -28,7 +28,7 @@ export class InputManager {
         return this.keysDown.has(code);
     }
 
-    iskeys(code) {
+    iskey(code) {
         return this.justPressed.has(code);
     }
 
