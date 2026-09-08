@@ -25,20 +25,27 @@ body{
 
 /* Game title styles */
 
+.game-title{
+    display:flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
 .game-title h1{
     font-family: 'Press Start 2P', sans-serif;
     color: #fff;
     text-align: center;
     letter-spacing: 0.1rem;
+    
 }
 
 #mad{
     padding-top: 20%;
     font-size: 5rem;
     color: #3a3ab5;
-    text-shadow: 6px 6px 0 #f8cf17,
-                 12px 12px 0 #f8cf17,
-                 18px 18px 1px #f8cf17;
+    text-shadow: 4px 4px 0 #f8cf17,
+                10px 10px 0 #f8cf17,
+                16px 16px 0 #f8cf17;
     transform: perspective(300px) rotateX(30deg);
     -webkit-text-stroke: 1px #dbcc6fcf;
     
@@ -47,9 +54,9 @@ body{
 #crasher{
     font-size: 5rem;
     color: #3a3ab5;
-    text-shadow: 6px 6px 0 #f8cf17,
-                 12px 12px 0 #f8cf17,
-                 18px 18px 1px #f8cf17;
+    text-shadow: 4px 4px 0 #f8cf17,
+                 10px 10px 0 #f8cf17,
+                 16px 16px 0 #f8cf17;
     transform: perspective(150px) rotateX(15deg);
     -webkit-text-stroke: 1px #dfd9b241;
 }
@@ -66,7 +73,39 @@ body{
 }
 
 .high-score{
-    height: 100px;
-    width: 100px;
+    width: 650px;
+    padding: 1.5rem;
+    border: 4px solid #f8cf17;
     background-color: #3a3ab5;
+    color: #fff;
+    font-family: 'Press Start 2P', sans-serif;
+    box-shadow: 8px 8px 0 #19194a;
+    position: relative;
+    top: -150px;
+    left: 400px;
+}
+
+.high-score h2{
+    margin-bottom: 2rem;
+    color: #f8cf17;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.high-score table{
+    width: 600px;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+    line-height: 0.75rem;
+}
+
+.high-score th,
+.high-score td{
+    padding: 0.75rem 0.5rem;
+    border-bottom: 3px solid #4a6f8ab5;
+}
+
+.high-score th{
+    color: #f8cf17;
+    font-size: 0.75rem;
 }
