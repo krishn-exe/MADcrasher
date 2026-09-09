@@ -28,7 +28,7 @@ export class InputManager {
         return this.keysDown.has(code);
     }
 
-    iskey(code) {
+    isJustPressed(code) {
         return this.justPressed.has(code);
     }
 
@@ -61,20 +61,72 @@ export class Renderer {
 export class EntityManager {
     constructor() {
         this.entities = [];
+
+        this.player = null;
+        this.enemies = [];
+        this.bullets = [];
+        this.roads = [];
+        this.boosts = [];
+        this.obstacles = [];
+
     }
+
     add(entity) {
         this.entities.push(entity);
-        return entity;
+        switch (entity.type) {
+            case 'player':
+                this.player = entity;
+                break;
+            case 'enemy':
+                this.enemies.push(entity);
+                break;
+            case 'bullet':
+                this.bullets.push(entity);
+                break;
+            case 'road':
+                this.roads.push(entity);
+                break;
+            case 'boost':
+                this.boosts.push(entity);
+                break;
+            case 'obstacle':
+                this.obstacles.push(entity);
+                break;
+        }
     }
     remove(entity) {
         const index = this.entities.indexOf(entity);
+        const type = entity.type;
+
         if (index > -1) {
             this.entities.splice(index, 1);
         }
+
+        switch (type) {
+            case 'player':
+                this.player = null;
+                break;
+            case 'enemy':
+                this.enemies.splice(this.enemies.indexOf(entity), 1);
+                break;
+            case 'bullet':
+                this.bullets.splice(this.bullets.indexOf(entity), 1);
+                break;
+            case 'road':
+                this.roads.splice(this.roads.indexOf(entity), 1);
+                break;
+            case 'boost':
+                this.boosts.splice(this.boosts.indexOf(entity), 1);
+                break;
+            case 'obstacle':
+                this.obstacles.splice(this.obstacles.indexOf(entity), 1);
+                break;
+        }
+
     }
     getEntities() {
         return this.entities;
-    }
+    }   
 
     areColliding(entityA, entityB) {
         const ax1 = entityA.x; const ax2 = entityA.x + entityA.width;
@@ -91,5 +143,70 @@ export class EntityManager {
             return true;
         }
         return false;
+    }
+
+    getCollisions() {
+
+        const collisions = {
+            playerWithEnemy: null,
+            playerWithBullets: [],
+            playerWithBoosts: [],
+            playerWithObstacles: [],
+            enemyPileups: [],
+        };
+
+        //Player collisions
+
+        for (let i = 0; i < this.enemies.length; i++) {
+            const enemy = this.enemies[i];
+            if (this.areColliding(this.player, enemy)) {
+                collisions.playerWithEnemy = enemy;
+            }
+        }
+
+        for (let i = 0; i < this.bullets.length; i++) {
+            const bullet = this.bullets[i];
+            if (this.areColliding(bullet, this.player)) {
+                collisions.playerWithBullets.push(bullet);
+            }
+        }
+
+        for (let i = 0; i < this.boosts.length; i++) {
+            const boost = this.boosts[i];
+            if (this.areColliding(boost, this.player)) {
+                collisions.playerWithBoosts.push(boost);
+            }
+        }
+
+        for (let i = 0; i < this.obstacles.length; i++) {
+            const obstacle = this.obstacles[i];
+            if (this.areColliding(obstacle, this.player)) {
+                collisions.playerWithObstacles.push(obstacle);
+            }
+        }
+
+
+        // Enemy collisions
+
+        for (let i = 0; i < this.bullets.length; i++) {
+            const bullet = this.bullets[i];
+            for (let j = 0; j < this.enemies.length; j++) {
+                const enemy = this.enemies[j];
+                if (this.areColliding(bullet, enemy)) {
+                    collisions.enemyPileups.push({ bullet, enemy });
+                    break;
+                }
+            }
+        }
+
+        for (let i = 0; i < this.enemies.length; i++) {
+            for (let j = i + 1; j < this.enemies.length ; j++) {
+                if (this.areColliding(this.enemies[i], this.enemies[j])) {
+                    collisions.enemyPileups.push([this.enemies[i], this.enemies[j]]);
+                }
+            }
+        }
+
+    return collisions;
     }
 }
