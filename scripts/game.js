@@ -141,12 +141,12 @@ class Vehicle {
             }
             if(IM.isDown('Space') && !this.isJumping){
                 this.isJumping = true;
-                this.vz=2.0;
+                this.vz=2.5;
             }
 
             if(this.isJumping){
                 this.z = this.z+this.vz;
-                this.vz = this.vz-0.12;
+                this.vz = this.vz-0.08;
 
                 if(this.z <= this.groundZ){
                     this.z = this.groundZ;
@@ -208,7 +208,7 @@ function gameLoop() {
             entity.update(scrollSpeed);
 
             if(entity.y + entity.length < -2){
-                entity.y = 20;
+                entity.y = 10;
             }
         }
     }
