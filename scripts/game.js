@@ -87,6 +87,10 @@ class RoadSegment {
         this.topColor = '#3d4452';
     }
 
+    update(speed){
+        this.y = this.y-speed;
+    }
+
     draw(ctx) {
 
         const pBack   = RD.screenCoords(this.x, this.y + this.length, this.z);
@@ -197,6 +201,17 @@ EM.entities.push(playerVehicle);
 function gameLoop() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const scrollSpeed = 0.08;
+    for(const entity of EM.entities){
+        if(entity instanceof RoadSegment){
+            entity.update(scrollSpeed);
+
+            if(entity.y + entity.length < -2){
+                entity.y = 20;
+            }
+        }
+    }
 
     playerVehicle.update();
     RD.render(EM.entities);
