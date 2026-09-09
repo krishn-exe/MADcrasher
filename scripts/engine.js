@@ -40,8 +40,8 @@ export class InputManager {
 export class Renderer {
     constructor(ctx) {
         this.ctx = ctx;
-        this.halfWidth = 50;
-        this.halfHeight = 25;
+        this.halfWidth = 60;
+        this.halfHeight = 30;
     }
     screenCoords(x,y,z){
         return {
@@ -55,5 +55,11 @@ export class Renderer {
         for(const entity of entities){
             entity.draw(this.ctx);
         }
+    }
+}
+
+export class EntityManager {
+    constructor() {
+        this.entities = [];
     }
 }

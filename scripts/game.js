@@ -1,5 +1,5 @@
 // Module imports
-import { InputManager, Renderer } from './engine.js';
+import { InputManager, Renderer, EntityManager} from './engine.js';
 
 
 // Canvas setup 
@@ -17,14 +17,15 @@ resizeCanvas();
 
 const IM = new InputManager();
 const RD = new Renderer(ctx);
+const EM = new EntityManager();
 
 class RoadSegment {
-    constructor(x, y) {
+    constructor(x, y , width = 7, length = 10) {
         this.x = x;       
         this.y = y;               
         this.z = 0;               
-        this.width = 6;
-        this.length = 10;
+        this.width = width;
+        this.length = length;
 
         this.topColor = '#3d4452';
     }
@@ -50,12 +51,8 @@ class RoadSegment {
 
 //Entities
 
-const entities = [];
-entities.push(new RoadSegment(9, 0));
-entities.push(new RoadSegment(9, 9));
-entities.push(new RoadSegment(9,18));
-entities.push(new RoadSegment(9, 27));
-
+EM.entities.push(new RoadSegment(5, 0));
+EM.entities.push(new RoadSegment(5, 10));
 
 
 // Game loop
@@ -66,7 +63,7 @@ function gameLoop() {
     ctx.fillStyle = 'blue';
     ctx.fillText('Press A D or space', 500, 300);
 
-    RD.render(entities);
+    RD.render(EM.entities);
 
     if (IM.isDown('KeyA') || IM.isDown("")) {
         ctx.font = '30px Arial';
