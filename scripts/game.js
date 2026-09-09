@@ -125,11 +125,22 @@ class Vehicle {
             if (IM.isDown('KeyD') || IM.isDown('ArrowRight')) {
                 this.x -= this.speed;
             }
+            if(IM.isDown('KeyW') || IM.isDown('ArrowUp')){
+                this.y += this.speed;
+            }
+            if(IM.isDown('KeyS') || IM.isDown('ArrowDown')) {
+                this.y -= this.speed;
+            }
 
-            const minX = 5;
-            const maxX = 11;
+            const minX = 5.2;
+            const maxX = 11.2;
             if(this.x < minX) this.x = minX;
             if(this.x > maxX) this.x = maxX
+
+            const minY = 0.8;
+            const maxY = 18.0;
+            if(this.y < minY) this.y = minY;
+            if(this.y > maxY) this.y = maxY;
         }
     }
 
@@ -140,13 +151,13 @@ class Vehicle {
         this.z
        );
 
-       const spriteWidth = 85;
-       const spriteHeight = 60; 
+       const spriteWidth = 105;
+       const spriteHeight = 78; 
 
        ctx.drawImage(
         bikeSprite,
         center.x - spriteWidth/2,
-        center.y = spriteHeight/2,
+        center.y - spriteHeight/2,
         spriteWidth,
         spriteHeight
        )
@@ -160,7 +171,7 @@ class Vehicle {
 EM.entities.push(new RoadSegment(5, 0));
 EM.entities.push(new RoadSegment(5, 10));
 
-const playerVehicle = new Vehicle('player', 8, 5);
+const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.entities.push(playerVehicle);
 
 // Game loop
