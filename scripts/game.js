@@ -77,7 +77,8 @@ function createBikeSprite(){
 const bikeSprite = createBikeSprite();  
 
 class RoadSegment {
-    constructor(x, y , width = 7, length = 10) {
+    constructor(x, y , width = 7, length = 5) {
+        this.type = 'road';
         this.x = x;       
         this.y = y;               
         this.z = 0;               
@@ -93,10 +94,10 @@ class RoadSegment {
 
     draw(ctx) {
 
-        const pBack   = RD.screenCoords(this.x, this.y + this.length, this.z);
-        const pRight  = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
-        const pFront  = RD.screenCoords(this.x + this.width, this.y, this.z);
-        const pLeft   = RD.screenCoords(this.x, this.y, this.z);
+        const pBack   = RD.screenCoords(this.x, this.y + this.length + 0.03, this.z);
+        const pRight  = RD.screenCoords(this.x + this.width, this.y + this.length + 0.03, this.z);
+        const pFront  = RD.screenCoords(this.x + this.width, this.y - 0.03, this.z);
+        const pLeft   = RD.screenCoords(this.x, this.y - 0.03, this.z);
 
         ctx.fillStyle = this.topColor;
         ctx.beginPath();
@@ -106,6 +107,26 @@ class RoadSegment {
         ctx.lineTo(pLeft.x, pLeft.y);
         ctx.closePath();
         ctx.fill();
+
+        const separatorBack = RD.screenCoords(
+            this.x + this.width / 2,
+            this.y + this.length + 0.03,
+            this.z + 0.01
+        );
+        const separatorFront = RD.screenCoords(
+            this.x + this.width / 2,
+            this.y - 0.03,
+            this.z + 0.01
+        );
+
+        ctx.strokeStyle = '#efecb0';
+        ctx.lineWidth = 5;
+        ctx.setLineDash([18, 32]);
+        ctx.beginPath();
+        ctx.moveTo(separatorBack.x, separatorBack.y);
+        ctx.lineTo(separatorFront.x, separatorFront.y);
+        ctx.stroke();
+        ctx.setLineDash([0,0]);
 
     }
 }
@@ -172,7 +193,7 @@ class Vehicle {
             }
             if(IM.isJustPressed('Space')){
                 this.isJumping = true;
-                this.vz=3;
+                this.vz=4;
             }
 
             if(this.isJumping){
@@ -254,11 +275,43 @@ class Vehicle {
 
 
 
-//Entities
+let roadSegmentCount = 0;
+let nextJumpAt = 12 + Math.floor(Math.random() * 4);
+let highestY = 0;
 
-EM.add(new RoadSegment(5, 0));
-EM.add(new RoadSegment(5, 10));
+function getNextGap() {
+    roadSegmentCount++;
+    if (roadSegmentCount >= nextJumpAt) {
+        nextJumpAt = roadSegmentCount + 12 + Math.floor(Math.random() * 4);
+        return 7.0; 
+    }
+    return 0;
+}
 
+// Initial Road segments
+const roadCount = 10;
+for (let i = 0; i < roadCount; i++) {
+    const gap = getNextGap();
+    EM.add(new RoadSegment(5, highestY, 7, 10));
+    highestY += 10 + gap;
+}
+
+// Segment updates
+function updateRoads(scrollSpeed = 0.1) {
+    highestY -= scrollSpeed;
+
+    for (const road of EM.roads) {
+        road.update(scrollSpeed);
+
+        if (road.y + road.length < -15) {
+            const gap = getNextGap();
+            road.y = highestY + gap;
+            highestY = road.y + road.length;
+        }
+    }
+}
+
+// Player entity
 const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.entities.push(playerVehicle);
 
@@ -267,17 +320,7 @@ function gameLoop() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const scrollSpeed = 0.08;
-    for(const entity of EM.entities){
-        if(entity instanceof RoadSegment){
-            entity.update(scrollSpeed);
-
-            if(entity.y + entity.length < -2){
-                entity.y = 10;
-            }
-        }
-    }
-
+    updateRoads();
     playerVehicle.update();
     RD.render(EM.entities);
     IM.update();
