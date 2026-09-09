@@ -50,7 +50,7 @@ export class Renderer {
         }
     }
     render(entities){
-        entities.sort((a,b) => (b.x + b.y) - (a.x + a.y));
+        entities.sort((a,b) => (a.z - b.z) || ((b.x + b.y) - (a.x + a.y)));
 
         for(const entity of entities){
             entity.draw(this.ctx);
