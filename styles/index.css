@@ -1,0 +1,162 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    background-color: #856A68;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+/* main menu container styles */
+
+.main-menu-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+}
+
+/* Game title styles */
+
+.game-title{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.game-title h1{
+    font-family: 'Press Start 2P', sans-serif;
+    color: #fff;
+    text-align: center;
+    letter-spacing: 0.1rem;
+    
+}
+
+#mad{
+    padding-top: 5%;
+    font-size: 5rem;
+    color: #3a3ab5;
+    text-shadow: 4px 4px 0 #f8cf17,
+                10px 10px 0 #f8cf17,
+                16px 16px 0 #f8cf17;
+    transform: perspective(300px) rotateX(30deg);
+    -webkit-text-stroke: 1px #dbcc6fcf;
+    
+}
+
+#crasher{
+    font-size: 5rem;
+    color: #3a3ab5;
+    text-shadow: 4px 4px 0 #f8cf17,
+                 10px 10px 0 #f8cf17,
+                 16px 16px 0 #f8cf17;
+    transform: perspective(150px) rotateX(15deg);
+    -webkit-text-stroke: 1px #dfd9b241;
+}
+
+/* Container styles */
+
+.container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5rem;
+    width: 100vw;
+    padding: 2rem 0.5rem;
+}
+
+/*High score table*/
+
+.high-score{
+    width: 650px;
+    min-height: 400px;
+    padding: 1.5rem;
+    border: 4px solid #f8cf17;
+    background-color: #3a3ab5;
+    color: #fff;
+    font-family: 'Press Start 2P', sans-serif;
+    box-shadow: 8px 8px 0 #19194a;
+    position: relative;
+}
+
+.high-score h2{
+    margin-bottom: 2rem;
+    color: #f8cf17;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.high-score table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+    line-height: 0.75rem;
+}
+
+.high-score th,
+.high-score td{
+    padding: 0.75rem 0.5rem;
+    border-bottom: 3px solid #4a6f8ab5;
+}
+
+.high-score th{
+    color: #f8cf17;
+    font-size: 0.75rem;
+}
+
+/* Game launcher styles */
+
+.game-launcher{
+    width: 600px;
+    height: 100%;
+    min-height: 400px;
+    padding: 1.5rem;
+    border: 4px solid #f8cf17;
+    background-color: #3a3ab5;
+    color: #fff;
+    font-family: 'Press Start 2P', sans-serif;
+    box-shadow: 8px 8px 0 #19194a;
+    position: relative;
+}
+
+#game-launcher-form{
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    gap: 1rem;
+    
+}
+
+#player-name{
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #f8cf17;
+    background-color: #3a3ab5;
+    color: #fff;
+    font-family: 'Press Start 2P', sans-serif;
+    font-size: 0.75rem;
+}
+
+#start-game-btn{
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #f8cf17;
+    background-color: #fff;
+    color: #000;
+    font-family: 'Press Start 2P', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+}
