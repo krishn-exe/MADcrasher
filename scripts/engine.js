@@ -5,7 +5,7 @@ export class InputManager {
     this.keysDown = new Set();
     this.justPressed = new Set();
 
-    const blockedKeys = new Set(['KeyA', 'KeyD', 'KeyE', 'Space']);
+    const blockedKeys = new Set(['KeyA', 'KeyD', 'KeyE', 'Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']);
 
         window.addEventListener('keydown', (e) => {
             if (blockedKeys.has(e.code)) {

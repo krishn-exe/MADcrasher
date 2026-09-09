@@ -62,12 +62,17 @@ class Vehicle {
 
     update() {
         if (this.type === 'player') {
-            if (IM.isDown('KeyA')) {
-                this.x -= this.speed;
-            }
-            if (IM.isDown('KeyD')) {
+            if (IM.isDown('KeyA') || IM.isDown('ArrowLeft')) {
                 this.x += this.speed;
             }
+            if (IM.isDown('KeyD') || IM.isDown('ArrowRight')) {
+                this.x -= this.speed;
+            }
+
+            const minX = 5;
+            const maxX = 11;
+            if(this.x < minX) this.x = minX;
+            if(this.x > maxX) this.x = maxX
         }
     }
 
