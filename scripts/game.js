@@ -110,6 +110,33 @@ class RoadSegment {
     }
 }
 
+class Bullet{
+    constructor(x, y, z){
+        this.x = x;
+        this.y=y;
+        this.z=z;
+        this.speed=0.6;
+        this.length=1.0;
+    }
+
+    update(){
+        this.y = this.y + this.speed;
+
+    }
+
+    draw(ctx){
+        const start = RD.screenCoords(this.x, this.y, this.z);
+        const tip = RD.screenCoords(this.x, this.y + this.length, this.z);
+
+        ctx.strokeStyle = '#00ffcc';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(tip.x, tip.y);
+        ctx.stroke();
+    }
+}
+
 class Vehicle {
     constructor(type, x = 8, y = 5) {
         this.type = type;
@@ -123,6 +150,9 @@ class Vehicle {
         this.groundZ= 20;
         this.vz= 0;
         this.isJumping = false;
+
+        this.bullets = [];
+        this.shootCoolDown = 0;
     }
 
     update() {
@@ -155,6 +185,32 @@ class Vehicle {
                 }
             }
 
+            if(this.shootCoolDown > 0){
+
+                this.shootCoolDown--;
+
+            }
+
+            if(IM.isDown('KeyZ') && this.shootCoolDown === 0){
+                const bullet = new Bullet(
+                    this.x + this.width /2,
+                    this.y + this.length,
+                    this.z
+                );
+
+              this.bullets.push(bullet);
+              this.shootCoolDown = 12;
+            }
+
+            for (let i = this.bullets.length - 1; i >= 0; i--) {
+                const b = this.bullets[i];
+                b.update();
+
+                 if (b.y > 25) {
+                    this.bullets.splice(i, 1);
+                }
+            }
+
             const minX = 5.2;
             const maxX = 11.2;
             if(this.x < minX) this.x = minX;
@@ -183,7 +239,15 @@ class Vehicle {
         center.y - spriteHeight/2,
         spriteWidth,
         spriteHeight
-       )
+       );
+
+       
+        for (const b of this.bullets) {
+            b.draw(ctx);
+        }
+
+
+
     }
 }
 
