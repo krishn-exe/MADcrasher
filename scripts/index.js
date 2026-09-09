@@ -12,7 +12,6 @@ class Player {
 }
 
 
-
 if (!localStorage.getItem('players')) {
 	localStorage.setItem('players', JSON.stringify([
 		{ name: 'James bond', highscore: 200 },
