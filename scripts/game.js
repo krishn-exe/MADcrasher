@@ -19,6 +19,63 @@ const IM = new InputManager();
 const RD = new Renderer(ctx);
 const EM = new EntityManager();
 
+
+function createBikeSprite(){
+    const sCanvas = document.createElement('canvas');
+    sCanvas.width = 120;
+    sCanvas.height = 90;
+    const sCtx = sCanvas.getContext('2d');
+
+   
+    sCtx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    sCtx.beginPath();
+    sCtx.ellipse(55, 60, 35, 14, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.fill();
+
+   
+    sCtx.fillStyle = '#201a40';
+    sCtx.beginPath();
+    sCtx.moveTo(20, 55);
+    sCtx.lineTo(95, 22);
+    sCtx.lineTo(105, 30);
+    sCtx.lineTo(30, 68);
+    sCtx.closePath();
+    sCtx.fill();
+
+    
+    sCtx.fillStyle = '#e61c38'; 
+    sCtx.beginPath();
+    sCtx.moveTo(105, 20); 
+    sCtx.lineTo(70, 52);  
+    sCtx.lineTo(25, 62);  
+    sCtx.lineTo(12, 48);  
+    sCtx.lineTo(45, 18);  
+    sCtx.closePath();
+    sCtx.fill();
+
+    sCtx.fillStyle = '#3a3ab5';
+    sCtx.beginPath();
+    sCtx.moveTo(50, 24);
+    sCtx.lineTo(90, 24);
+    sCtx.lineTo(60, 44);
+    sCtx.lineTo(30, 44);
+    sCtx.closePath();
+    sCtx.fill();
+
+    sCtx.fillStyle = '#00f0ff';
+    sCtx.beginPath();
+    sCtx.ellipse(72, 26, 14, 6, -Math.PI / 8, 0, Math.PI * 2);
+    sCtx.fill();
+
+    sCtx.fillStyle = '#ffcc00';
+    sCtx.fillRect(14, 52, 10, 6);
+    sCtx.fillRect(26, 58, 10, 6);
+
+    return sCanvas;
+}
+
+const bikeSprite = createBikeSprite();  
+
 class RoadSegment {
     constructor(x, y , width = 7, length = 10) {
         this.x = x;       
@@ -77,19 +134,22 @@ class Vehicle {
     }
 
     draw(ctx) {
-        const pBack = RD.screenCoords(this.x, this.y + this.length, this.z);
-        const pRight = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
-        const pFront = RD.screenCoords(this.x + this.width, this.y, this.z);
-        const pLeft = RD.screenCoords(this.x, this.y, this.z);
+       const center = RD.screenCoords(
+        this.x + this.width/2,
+        this.y + this.length/2,
+        this.z
+       );
 
-        ctx.fillStyle = '#00e5ff';
-        ctx.beginPath();
-        ctx.moveTo(pBack.x, pBack.y);
-        ctx.lineTo(pRight.x, pRight.y);
-        ctx.lineTo(pFront.x, pFront.y);
-        ctx.lineTo(pLeft.x, pLeft.y);
-        ctx.closePath();
-        ctx.fill();
+       const spriteWidth = 85;
+       const spriteHeight = 60; 
+
+       ctx.drawImage(
+        bikeSprite,
+        center.x - spriteWidth/2,
+        center.y = spriteHeight/2,
+        spriteWidth,
+        spriteHeight
+       )
     }
 }
 
