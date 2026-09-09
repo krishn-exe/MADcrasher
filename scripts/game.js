@@ -138,14 +138,15 @@ class Bullet{
 }
 
 class Vehicle {
-    constructor(type, x = 8, y = 5) {
-        this.type = type;
+    constructor(type, x, y) {
+        this.type = type
         this.x = x;
         this.y = y;
-        this.z = 20; 
+        this.z = 5; 
         this.speed = 0.1;
         this.width = 1;
         this.length = 1.5;
+        this.height = 1;
 
         this.groundZ= 20;
         this.vz= 0;
@@ -169,9 +170,9 @@ class Vehicle {
             if(IM.isDown('KeyS') || IM.isDown('ArrowDown')) {
                 this.y -= this.speed;
             }
-            if(IM.isDown('Space') && !this.isJumping){
+            if(IM.isJustPressed('Space')){
                 this.isJumping = true;
-                this.vz=2.5;
+                this.vz=3;
             }
 
             if(this.isJumping){
@@ -191,7 +192,7 @@ class Vehicle {
 
             }
 
-            if(IM.isDown('KeyZ') && this.shootCoolDown === 0){
+            if(IM.isDown('KeyE') && this.shootCoolDown === 0){
                 const bullet = new Bullet(
                     this.x + this.width /2,
                     this.y + this.length,
@@ -255,8 +256,8 @@ class Vehicle {
 
 //Entities
 
-EM.entities.push(new RoadSegment(5, 0));
-EM.entities.push(new RoadSegment(5, 10));
+EM.add(new RoadSegment(5, 0));
+EM.add(new RoadSegment(5, 10));
 
 const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.entities.push(playerVehicle);
