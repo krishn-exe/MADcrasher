@@ -1,8 +1,8 @@
 // Load references to the HTML elements
 
-const playerNameInput = document.getElementById('player-name');
-const startButton = document.getElementById('start-game-btn');
-const highScoreTable = document.getElementById('high-score-list');
+const playerNameInput = document.getElementById('playerName');
+const startButton = document.getElementById('startGameBtn');
+const highScoreTable = document.getElementById('highScoreList');
 
 class Player {
 	constructor(name) {
@@ -11,15 +11,15 @@ class Player {
 	}
 }
 
-//Temporary placeholder data
 
-localStorage.setItem('players', JSON.stringify([
-	{ name: 'James bond', highscore: 200 },
-	{ name: 'John Wick', highscore: 300 },
-	{ name: 'Ghost Rider', highscore: 250 },
-]));
+if (!localStorage.getItem('players')) {
+	localStorage.setItem('players', JSON.stringify([
+		{ name: 'James bond', highscore: 200 },
+		{ name: 'John Wick', highscore: 184 },
+		{ name: 'Ghost Rider', highscore: 250 },
+	]));
+}
 
-// High score table
 
 let players = JSON.parse(localStorage.getItem('players')) || [];
 players.sort((a, b) => b.highscore - a.highscore);

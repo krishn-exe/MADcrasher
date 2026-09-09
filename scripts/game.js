@@ -1,84 +1,112 @@
-const canvas = document.getElementById("game-canvas");
-const c = canvas.getContext('2d');
+// Module imports
+import { InputManager, Renderer, EntityManager} from './engine.js';
 
-const player = {
-  x: 400,
-  y: 450,
-  width: 60,
-  height: 30,
-  color:'#ff2244'
+
+// Canvas setup 
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
 
-const road = {
-  x:150,
-  width: 500,
-  speed: 5,
-  thickness: 20,
-  surfaceColor: '#8a84a6',
-  wallColor: '#453e66' 
-};
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
 
-let platforms = [
-  {y: -200, height: 500},
-  {y: 400, height: 500}
-]
+const IM = new InputManager();
+const RD = new Renderer(ctx);
+const EM = new EntityManager();
 
-const keys = {};
+class RoadSegment {
+    constructor(x, y , width = 7, length = 10) {
+        this.x = x;       
+        this.y = y;               
+        this.z = 0;               
+        this.width = width;
+        this.length = length;
 
-window.addEventListener('keydown', (e)=>{
-  keys[e.code] = true;
-});
+        this.topColor = '#3d4452';
+    }
 
-window.addEventListener('keyup', (e)=>{
-  keys[e.code] = false;
-});
+    draw(ctx) {
 
-function drawRoad(){
-  for(let i = 0; i<platforms.length; i++){
-    const plat = platform[i];
-  }
+        const pBack   = RD.screenCoords(this.x, this.y + this.length, this.z);
+        const pRight  = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
+        const pFront  = RD.screenCoords(this.x + this.width, this.y, this.z);
+        const pLeft   = RD.screenCoords(this.x, this.y, this.z);
+
+        ctx.fillStyle = this.topColor;
+        ctx.beginPath();
+        ctx.moveTo(pBack.x, pBack.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pLeft.x, pLeft.y);
+        ctx.closePath();
+        ctx.fill();
+
+    }
 }
 
-function drawPlayer(){
-  c.fillStyle = player.color;
-  c.fillRect(player.x-player.width/2,
-    player.y-player.height,
-    player.width,
-    player.height
-  );
+class Vehicle {
+    constructor(type, x = 8, y = 5) {
+        this.type = type;
+        this.x = x;
+        this.y = y;
+        this.z = 20; 
+        this.speed = 0.1;
+        this.width = 1;
+        this.length = 1.5;
+    }
+
+    update() {
+        if (this.type === 'player') {
+            if (IM.isDown('KeyA')) {
+                this.x -= this.speed;
+            }
+            if (IM.isDown('KeyD')) {
+                this.x += this.speed;
+            }
+        }
+    }
+
+    draw(ctx) {
+        const pBack = RD.screenCoords(this.x, this.y + this.length, this.z);
+        const pRight = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
+        const pFront = RD.screenCoords(this.x + this.width, this.y, this.z);
+        const pLeft = RD.screenCoords(this.x, this.y, this.z);
+
+        ctx.fillStyle = '#00e5ff';
+        ctx.beginPath();
+        ctx.moveTo(pBack.x, pBack.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pLeft.x, pLeft.y);
+        ctx.closePath();
+        ctx.fill();
+    }
 }
 
 
-function updatePlayer() {
-  const speed = 5;
 
-  if (keys['ArrowLeft'] || keys['KeyA']){
-    player.x = player.x-speed;
-  }
+//Entities
 
-  if(keys['ArrowRight'] || keys['KeyD']){
-    player.x = player.x+speed;
-  }
+EM.entities.push(new RoadSegment(5, 0));
+EM.entities.push(new RoadSegment(5, 10));
 
-  const halfWidth = player.width/2;
-  if(player.x < halfWidth){
-    player.x = halfWidth;
-  }
+const playerVehicle = new Vehicle('player', 8, 5);
+EM.entities.push(playerVehicle);
 
-  if(player.x > canvas.width - halfWidth){
-    player.x = canvas.width - halfWidth;
-  }
+// Game loop
+function gameLoop() {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    playerVehicle.update();
+    RD.render(EM.entities);
+    IM.update();
+    requestAnimationFrame(gameLoop);
 }
 
-function gameLoop(){
-  c.clearRect(0, 0, canvas.width, canvas.height);
-
-  updatePlayer();
-
-  drawPlayer();
-
-  requestAnimationFrame(gameLoop);
-}
-
-requestAnimationFrame(gameLoop);
+gameLoop();

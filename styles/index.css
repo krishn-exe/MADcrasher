@@ -129,7 +129,7 @@ body{
     position: relative;
 }
 
-#game-launcher-form{
+#gameLauncherForm{
     display: flex;
     flex-direction: column;
     align-items: left;
@@ -138,7 +138,7 @@ body{
     
 }
 
-#player-name{
+#playerName{
     width: 100%;
     padding: 0.75rem;
     border: 2px solid #f8cf17;
@@ -148,7 +148,7 @@ body{
     font-size: 0.75rem;
 }
 
-#start-game-btn{
+#startGameBtn{
     width: 100%;
     padding: 0.75rem;
     border: 2px solid #f8cf17;
