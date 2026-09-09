@@ -62,4 +62,34 @@ export class EntityManager {
     constructor() {
         this.entities = [];
     }
+    add(entity) {
+        this.entities.push(entity);
+        return entity;
+    }
+    remove(entity) {
+        const index = this.entities.indexOf(entity);
+        if (index > -1) {
+            this.entities.splice(index, 1);
+        }
+    }
+    getEntities() {
+        return this.entities;
+    }
+
+    areColliding(entityA, entityB) {
+        const ax1 = entityA.x; const ax2 = entityA.x + entityA.width;
+        const ay1 = entityA.y; const ay2 = entityA.y + entityA.length;
+        const az1 = entityA.z; const az2 = entityA.z + entityA.height;
+
+        const bx1 = entityB.x; const bx2 = entityB.x + entityB.width;
+        const by1 = entityB.y; const by2 = entityB.y + entityB.length;
+        const bz1 = entityB.z; const bz2 = entityB.z + entityB.height;
+
+        if (ax1 < bx2 && ax2 > bx1 &&
+            ay1 < by2 && ay2 > by1 &&
+            az1 < bz2 && az2 > bz1) {
+            return true;
+        }
+        return false;
+    }
 }

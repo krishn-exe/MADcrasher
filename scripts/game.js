@@ -50,14 +50,15 @@ class RoadSegment {
 }
 
 class Vehicle {
-    constructor(type, x = 8, y = 5) {
-        this.type = type;
+    constructor(type, x, y) {
+        this.type = type
         this.x = x;
         this.y = y;
-        this.z = 20; 
+        this.z = 5; 
         this.speed = 0.1;
         this.width = 1;
         this.length = 1.5;
+        this.height = 1;
     }
 
     update() {
@@ -92,11 +93,11 @@ class Vehicle {
 
 //Entities
 
-EM.entities.push(new RoadSegment(5, 0));
-EM.entities.push(new RoadSegment(5, 10));
+EM.add(new RoadSegment(5, 0));
+EM.add(new RoadSegment(5, 10));
 
 const playerVehicle = new Vehicle('player', 8, 5);
-EM.entities.push(playerVehicle);
+EM.add(playerVehicle);
 
 // Game loop
 function gameLoop() {
