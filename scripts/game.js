@@ -273,7 +273,35 @@ class Vehicle {
     }
 }
 
+class Obstacle {
+    constructor(x, y, z, width = 1, length = 1) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.width = width;
+        this.length = length;
+        this.height = 1;
+        this.type = 'obstacle';
 
+
+    }
+
+    draw(ctx) {
+        let pBack = RD.screenCoords(this.x, this.y + this.length, this.z);
+        let pRight = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
+        let pFront = RD.screenCoords(this.x + this.width, this.y, this.z);
+        let pLeft = RD.screenCoords(this.x, this.y, this.z);
+
+        ctx.fillStyle = '#8B0000';
+        ctx.beginPath();
+        ctx.moveTo(pBack.x, pBack.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pLeft.x, pLeft.y);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
 
 let roadSegmentCount = 0;
 let nextJumpAt = 12 + Math.floor(Math.random() * 4);
@@ -314,6 +342,10 @@ function updateRoads(scrollSpeed = 0.1) {
 // Player entity
 const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.entities.push(playerVehicle);
+
+//Obstacle entity
+const obstacle = new Obstacle(7, 10, 20);
+EM.entities.push(obstacle);
 
 // Game loop
 function gameLoop() {
