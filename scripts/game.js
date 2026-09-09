@@ -115,6 +115,10 @@ class Vehicle {
         this.speed = 0.1;
         this.width = 1;
         this.length = 1.5;
+
+        this.groundZ= 20;
+        this.vz= 0;
+        this.isJumping = false;
     }
 
     update() {
@@ -130,6 +134,21 @@ class Vehicle {
             }
             if(IM.isDown('KeyS') || IM.isDown('ArrowDown')) {
                 this.y -= this.speed;
+            }
+            if(IM.isDown('Space') && !this.isJumping){
+                this.isJumping = true;
+                this.vz=2.0;
+            }
+
+            if(this.isJumping){
+                this.z = this.z+this.vz;
+                this.vz = this.vz-0.12;
+
+                if(this.z <= this.groundZ){
+                    this.z = this.groundZ;
+                    this.vz=0;
+                    this.isJumping=false;
+                }
             }
 
             const minX = 5.2;
