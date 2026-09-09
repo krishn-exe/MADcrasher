@@ -87,6 +87,10 @@ class RoadSegment {
         this.topColor = '#3d4452';
     }
 
+    update(speed){
+        this.y = this.y-speed;
+    }
+
     draw(ctx) {
 
         const pBack   = RD.screenCoords(this.x, this.y + this.length, this.z);
@@ -115,6 +119,10 @@ class Vehicle {
         this.speed = 0.1;
         this.width = 1;
         this.length = 1.5;
+
+        this.groundZ= 20;
+        this.vz= 0;
+        this.isJumping = false;
     }
 
     update() {
@@ -130,6 +138,21 @@ class Vehicle {
             }
             if(IM.isDown('KeyS') || IM.isDown('ArrowDown')) {
                 this.y -= this.speed;
+            }
+            if(IM.isDown('Space') && !this.isJumping){
+                this.isJumping = true;
+                this.vz=2.5;
+            }
+
+            if(this.isJumping){
+                this.z = this.z+this.vz;
+                this.vz = this.vz-0.08;
+
+                if(this.z <= this.groundZ){
+                    this.z = this.groundZ;
+                    this.vz=0;
+                    this.isJumping=false;
+                }
             }
 
             const minX = 5.2;
@@ -178,6 +201,17 @@ EM.entities.push(playerVehicle);
 function gameLoop() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const scrollSpeed = 0.08;
+    for(const entity of EM.entities){
+        if(entity instanceof RoadSegment){
+            entity.update(scrollSpeed);
+
+            if(entity.y + entity.length < -2){
+                entity.y = 10;
+            }
+        }
+    }
 
     playerVehicle.update();
     RD.render(EM.entities);
