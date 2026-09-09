@@ -36,3 +36,24 @@ export class InputManager {
         this.justPressed.clear();
     }
 }
+
+export class Renderer {
+    constructor(ctx) {
+        this.ctx = ctx;
+        this.halfWidth = 50;
+        this.halfHeight = 25;
+    }
+    screenCoords(x,y,z){
+        return {
+            x: this.ctx.canvas.width / 2 + (y - x) * this.halfWidth,
+            y: this.ctx.canvas.height - ((x + y) * this.halfHeight + z)
+        }
+    }
+    render(entities){
+        entities.sort((a,b) => (b.x + b.y) - (a.x + a.y));
+
+        for(const entity of entities){
+            entity.draw(this.ctx);
+        }
+    }
+}
