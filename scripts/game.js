@@ -278,7 +278,7 @@ class Vehicle {
         this.x = x;
         this.y = y;
         this.z = 5; 
-        this.speed = 0.1;
+        this.speed = 0.12;
         this.width = 1;
         this.length = 1.5;
 
@@ -438,8 +438,18 @@ class Enemy {
 
 //Entities
 
-EM.entities.push(new RoadSegment(5, 0));
-EM.entities.push(new RoadSegment(5, 10));
+const roadSegments = [
+    new RoadSegment(5, 0, 7, 10),
+    new RoadSegment(5, 10, 7, 10),
+
+    // Gap of 4 world units
+    new RoadSegment(5, 24, 7, 10),
+    new RoadSegment(5, 34, 7, 10)
+];
+
+for (const road of roadSegments) {
+    EM.entities.push(road);
+}
 
 const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.entities.push(playerVehicle);
@@ -462,15 +472,15 @@ function gameLoop() {
     drawStarField(ctx);
 
     const scrollSpeed = 0.08;
-    for(const entity of EM.entities){
-        if(entity instanceof RoadSegment){
-            entity.update(scrollSpeed);
+    for (const entity of EM.entities) {
+    if (entity instanceof RoadSegment) {
+        entity.update(scrollSpeed);
 
-            if(entity.y + entity.length < 0){
-                entity.y += 20;
-            }
+        if (entity.y + entity.length < 0) {
+            entity.y += 44;
         }
     }
+}
 
         for (const enemy of enemies) {
         enemy.update(scrollSpeed);
