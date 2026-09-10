@@ -66,12 +66,16 @@ export class EntityManager {
         this.roads = [];
         this.boosts = [];
         this.obstacles = [];
+        this.background = null;
 
     }
 
     add(entity) {
         this.entities.push(entity);
         switch (entity.type) {
+            case 'background':
+                this.background = entity;
+                break;
             case 'player':
                 this.player = entity;
                 break;
@@ -102,6 +106,9 @@ export class EntityManager {
         }
 
         switch (type) {
+            case 'background':
+                this.background = null;
+                break;
             case 'player':
                 this.player = null;
                 break;

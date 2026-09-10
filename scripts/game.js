@@ -229,40 +229,69 @@ function createDestroyedEnemySprite() {
 }
 const destroyedEnemySprite = createDestroyedEnemySprite();
 
-const stars = [];
-const starCount = 60;
+class ParallaxBackground {
+    constructor(imageSrc = 'assets/background.png') {
+        this.type = 'background';
+        this.z = -999999;
+        this.x = 0;
+        this.y = 0;
 
-for(let i = 0; i< starCount; i++){
-    stars.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        size: Math.random() * 1.5  + 0.5,
-        speed: Math.random() * 1.5 + 0.5,
-        alpha: Math.random() * 0.7 + 0.3,
-        
-    })
-}
+        this.image = new Image();
+        this.isLoaded = false;
+        this.image.onload = () => {
+            this.isLoaded = true;
+        };
+        this.image.onerror = () => {
+            if (!this.image.src.includes('backround.png')) {
+                this.image.src = 'assets/backround.png';
+            }
+        };
+        this.image.src = imageSrc;
 
-function drawStarField(ctx) {
-    ctx.fillStyle = '#08082a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+        if (this.image.complete && this.image.naturalWidth > 0) {
+            this.isLoaded = true;
+        }
 
-    ctx.fillStyle =  '#ffffff';
-    for(const s of stars){
-        ctx.globalAlpha = s.alpha;
-        ctx.fillRect(s.x, s.y, s.size, s.size);
-        
-        s.y = s.y + s.speed;
-        
-        if(s.y > canvas.height){
-        s.y = 0;    
-        s.x = Math.random() * canvas.width;
-       }
+        this.scrollX = 0;
+        this.scrollY = 0;
+        this.steerOffset = 0;
+        this.parallaxSpeed = 0.2;
     }
 
-    ctx.globalAlpha = 1.0;
+    update(scrollSpeed, player) {
+        this.scrollX -= scrollSpeed * 60 * this.parallaxSpeed;
+        this.scrollY += scrollSpeed * 30 * this.parallaxSpeed;
 
-    
+        if (player) {
+            const centerTrackX = 8.2;
+            const targetSteerOffset = (player.x - centerTrackX) * 8;
+            this.steerOffset += (targetSteerOffset - this.steerOffset) * 0.1;
+        }
+    }
+
+    draw(ctx) {
+        const canvas = ctx.canvas;
+
+        ctx.fillStyle = '#08082a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (!this.image.complete || !this.image.naturalWidth) {
+            return;
+        }
+
+        const aspect = this.image.naturalWidth / this.image.naturalHeight;
+        const tileHeight = Math.max(canvas.height, 600);
+        const tileWidth = tileHeight * aspect;
+
+        const startX = (((this.scrollX + this.steerOffset) % tileWidth) + tileWidth) % tileWidth - tileWidth;
+        const startY = ((this.scrollY % tileHeight) + tileHeight) % tileHeight - tileHeight;
+
+        for (let x = startX; x < canvas.width; x += tileWidth) {
+            for (let y = startY; y < canvas.height; y += tileHeight) {
+                ctx.drawImage(this.image, Math.floor(x), Math.floor(y), Math.ceil(tileWidth), Math.ceil(tileHeight));
+            }
+        }
+    }
 }
 
 class RoadSegment {
@@ -676,6 +705,9 @@ class BoostPad {
 const Boost = BoostPad;
 const boosts = BoostPad;
 
+const parallaxBg = new ParallaxBackground('assets/background.png');
+EM.add(parallaxBg);
+
 const roadSegments = [
     new RoadSegment(5, 0, 7, 10),
     new RoadSegment(5, 10, 7, 10),
@@ -692,6 +724,7 @@ const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.add(playerVehicle);
 
 window.__MAD_CRASHER__ = {
+    background: parallaxBg,
     player: playerVehicle,
     getScore: () => score,
     getLives: () => playerVehicle.lives,
@@ -773,10 +806,10 @@ function gameLoop() {
         lastSpeedIncreaseTime = now;
     }
 
-    drawStarField(ctx);
-
     const speedRatio = playerVehicle.speed / playerVehicle.baseSpeed;
     const scrollSpeed = baseScrollSpeed * speedRatio;
+
+    parallaxBg.update(scrollSpeed, playerVehicle);
 
     for (const entity of EM.entities) {
         if (entity instanceof RoadSegment) {
