@@ -407,7 +407,10 @@ class Vehicle {
         this.destroyTimer = this.destroyFrames;
         this.lives--;
         const crashSound = document.getElementById('crashSound');
-        crashSound.play();
+        if (crashSound) {
+            crashSound.currentTime = 0;
+            crashSound.play().catch(() => {});
+        }
     }
 
     update() {
@@ -456,7 +459,7 @@ class Vehicle {
             }
             if(IM.isDown('Space') && !this.isJumping){
                 this.isJumping = true;
-                this.vz=2.5;
+                this.vz=4;
             }
 
             if(this.isJumping){
@@ -836,6 +839,25 @@ function gameLoop() {
     }
 
     playerVehicle.update();
+
+    // Road check: destroy player if there is no road segment under the player and not in jumping state
+    const px = playerVehicle.x + playerVehicle.width / 2;
+    const py = playerVehicle.y + playerVehicle.length / 2;
+    let isOnRoad = false;
+
+    for (const entity of EM.entities) {
+        if (entity instanceof RoadSegment) {
+            if (px >= entity.x && px <= entity.x + entity.width &&
+                py >= entity.y && py <= entity.y + entity.length) {
+                isOnRoad = true;
+                break;
+            }
+        }
+    }
+
+    if (!isOnRoad && !playerVehicle.isJumping && !playerVehicle.isDestroyed) {
+        playerVehicle.destroy();
+    }
 
     const collisions = EM.getCollisions();
 
