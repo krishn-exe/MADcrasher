@@ -406,6 +406,8 @@ class Vehicle {
         this.isDestroyed = true;
         this.destroyTimer = this.destroyFrames;
         this.lives--;
+        const crashSound = document.getElementById('crashSound');
+        crashSound.play();
     }
 
     update() {
