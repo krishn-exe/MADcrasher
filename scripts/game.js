@@ -19,6 +19,11 @@ const IM = new InputManager();
 const RD = new Renderer(ctx);
 const EM = new EntityManager();
 
+// Player information
+const urlParams = new URLSearchParams(window.location.search);
+const playerName = urlParams.get('player-name') || localStorage.getItem('currentPlayer') || 'Player';
+localStorage.setItem('currentPlayer', playerName);
+
 
 function createBikeSprite() {
     const sCanvas = document.createElement('canvas');
@@ -369,7 +374,10 @@ class Vehicle {
         this.y = y;
         this.z = 5; 
         this.baseSpeed = 0.12;
-        this.speed = 0.12;
+        this.maxSpeed = 0.28;
+        this.accelerationRate = 0.007; // Smooth acceleration while on boost pad
+        this.decelerationRate = 0.003; // Smooth deceleration after leaving boost pad
+        this.speed = this.baseSpeed;
         this.width = 1;
         this.length = 1.5;
         this.height = 1;
@@ -386,6 +394,9 @@ class Vehicle {
         this.destroyFrames = 30; // duration in frames to show destroyed sprite
         this.destroyTimer = 0;
 
+        // Lives system (starts with 3 lives)
+        this.lives = 3;
+
         // Boost Pad: active only while colliding
         this.isOnBoostPad = false;
     }
@@ -394,6 +405,7 @@ class Vehicle {
         if (this.isDestroyed) return;
         this.isDestroyed = true;
         this.destroyTimer = this.destroyFrames;
+        this.lives--;
     }
 
     update() {
@@ -401,8 +413,13 @@ class Vehicle {
             if (this.destroyTimer === 0) this.destroyTimer = this.destroyFrames;
             this.destroyTimer--;
             if (this.destroyTimer <= 0) {
-                this.isDestroyed = false;
                 this.destroyTimer = 0;
+                // If lives are exhausted, trigger Game Over
+                if (this.lives <= 0) {
+                    triggerGameOver();
+                    return;
+                }
+                this.isDestroyed = false;
                 // Reset player position and boosts after destruction
                 this.x = 6.5;
                 this.y = 4;
@@ -410,15 +427,16 @@ class Vehicle {
                 this.vz = 0;
                 this.isJumping = false;
                 this.isOnBoostPad = false;
+                this.speed = this.baseSpeed;
             }
             return;
         }
 
-        // Boost pad gives a massive speed increase only while colliding
+        // Boost pad acceleration and smooth deceleration
         if (this.isOnBoostPad) {
-            this.speed = this.baseSpeed * 2.5;
-        } else {
-            this.speed = this.baseSpeed;
+            this.speed = Math.min(this.maxSpeed, this.speed + this.accelerationRate);
+        } else if (this.speed > this.baseSpeed) {
+            this.speed = Math.max(this.baseSpeed, this.speed - this.decelerationRate);
         }
 
         if (this.type === 'player') {
@@ -498,18 +516,20 @@ class Vehicle {
        const spriteWidth = 105;
        const spriteHeight = 78; 
 
-       // Boost thruster flames behind the bike when on boost pad
-       if (this.isOnBoostPad) {
-           ctx.save();
-           const flameLen = 34;
-           ctx.strokeStyle = '#ff6600';
-           ctx.lineWidth = 4;
-           ctx.beginPath();
-           ctx.moveTo(center.x + 22, center.y + 10);
-           ctx.lineTo(center.x + 22 + flameLen, center.y + 10 - flameLen * 0.45);
-           ctx.stroke();
-           ctx.restore();
-       }
+        // Boost thruster flames behind the bike when boosted (smoothly scales with speed)
+        const boostAmount = this.speed - this.baseSpeed;
+        if (boostAmount > 0.005) {
+            const boostRatio = Math.min(1.0, boostAmount / (this.maxSpeed - this.baseSpeed));
+            ctx.save();
+            const flameLen = 12 + 26 * boostRatio;
+            ctx.strokeStyle = boostRatio > 0.6 ? '#ff3300' : '#ff9900';
+            ctx.lineWidth = 2 + 3 * boostRatio;
+            ctx.beginPath();
+            ctx.moveTo(center.x + 22, center.y + 10);
+            ctx.lineTo(center.x + 22 + flameLen, center.y + 10 - flameLen * 0.45);
+            ctx.stroke();
+            ctx.restore();
+        }
 
        const currentSprite = this.isDestroyed ? destroyedBikeSprite : bikeSprite;
 
@@ -698,6 +718,15 @@ for (const road of roadSegments) {
 const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.add(playerVehicle);
 
+// Debug interface for tests and telemetry
+window.__MAD_CRASHER__ = {
+    player: playerVehicle,
+    getScore: () => score,
+    getLives: () => playerVehicle.lives,
+    getBaseScrollSpeed: () => baseScrollSpeed,
+    triggerGameOver
+};
+
 
 const enemies = [
     new Enemy(7.0, 16),
@@ -719,15 +748,72 @@ for (const pad of boostPads) {
 }
 
 let score = 0;
+let lastScoreTime = Date.now();
+let isGameOver = false;
 
+// Progressive scroll speed: increases every 10 seconds of active survival
+let baseScrollSpeed = 0.08;
+const scrollSpeedIncrement = 0.012; // +0.012 every 10 seconds
+const maxBaseScrollSpeed = 0.22;
+let lastSpeedIncreaseTime = Date.now();
+
+function triggerGameOver() {
+    if (isGameOver) return;
+    isGameOver = true;
+
+    // Save final score
+    localStorage.setItem('lastScore', score.toString());
+
+    // Update player highscore in localStorage if higher
+    try {
+        let players = JSON.parse(localStorage.getItem('players')) || [];
+        let player = players.find(p => p.name.toLowerCase() === playerName.toLowerCase());
+        if (player) {
+            if (score > player.highscore) {
+                player.highscore = score;
+            }
+        } else {
+            players.push({ name: playerName, highscore: score });
+        }
+        localStorage.setItem('players', JSON.stringify(players));
+    } catch (err) {
+        console.error('Failed to update players highscore:', err);
+    }
+
+    // Forward to gameover.html
+    window.location.href = `gameover.html?score=${score}&player-name=${encodeURIComponent(playerName)}`;
+}
 
 // Game loop
 function gameLoop() {
+    if (isGameOver) return;
+
+    const now = Date.now();
+
+    // Score increment: +10 points for every second survived while alive
+    if (!playerVehicle.isDestroyed && playerVehicle.lives > 0) {
+        if (now - lastScoreTime >= 1000) {
+            const elapsedSeconds = Math.floor((now - lastScoreTime) / 1000);
+            score += elapsedSeconds * 10;
+            lastScoreTime += elapsedSeconds * 1000;
+        }
+
+        // Progressive scroll speed: increases every 10 seconds
+        if (now - lastSpeedIncreaseTime >= 10000) {
+            const intervals = Math.floor((now - lastSpeedIncreaseTime) / 10000);
+            baseScrollSpeed = Math.min(maxBaseScrollSpeed, baseScrollSpeed + intervals * scrollSpeedIncrement);
+            lastSpeedIncreaseTime += intervals * 10000;
+        }
+    } else {
+        lastScoreTime = now;
+        lastSpeedIncreaseTime = now;
+    }
+
     drawStarField(ctx);
 
-    // Dynamic scroll speed: faster when on boost pad
-    const baseScrollSpeed = 0.08;
-    const scrollSpeed = playerVehicle.isOnBoostPad ? baseScrollSpeed * 2.2 : baseScrollSpeed;
+    // Dynamic scroll speed: scales smoothly as player accelerates and decelerates
+    const speedRatio = playerVehicle.speed / playerVehicle.baseSpeed;
+    const scrollSpeed = baseScrollSpeed * speedRatio;
 
     for (const entity of EM.entities) {
         if (entity instanceof RoadSegment) {
@@ -770,7 +856,7 @@ function gameLoop() {
                 enemy.destroy();
 
                 // Award points
-                score += 100;
+                score += 150;
                 break;
             }
         }
@@ -790,10 +876,38 @@ function gameLoop() {
     RD.render(EM.entities);
     IM.update();
 
-    // Draw Retro Arcade Score HUD
-    ctx.fillStyle = '#ffff00';
-    ctx.font = 'bold 22px "Courier New", monospace';
-    ctx.fillText(`SCORE: ${score}`, 30, 45);
+    // Draw Retro Arcade HUD
+    ctx.save();
+    ctx.shadowColor = '#000000';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+
+    // Score
+    ctx.fillStyle = '#f8cf17';
+    ctx.font = 'bold 16px "Press Start 2P", "Courier New", monospace';
+    ctx.fillText(`SCORE: ${score}`, 25, 40);
+
+    // Lives
+    ctx.fillStyle = '#f8cf17';
+    ctx.fillText('LIVES:', 25, 72);
+    for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = (i < playerVehicle.lives) ? '#e61c38' : '#444444';
+        ctx.fillText('♥', 125 + i * 26, 72);
+    }
+
+    // Pilot
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = '12px "Press Start 2P", "Courier New", monospace';
+    ctx.fillText(`PILOT: ${playerName}`, 25, 102);
+
+    // Speed progression
+    const speedMultiplier = (baseScrollSpeed / 0.08).toFixed(1);
+    ctx.fillStyle = '#ffaa00';
+    ctx.font = '11px "Press Start 2P", "Courier New", monospace';
+    ctx.fillText(`SPEED: ${speedMultiplier}x`, 25, 126);
+
+    ctx.restore();
 
     requestAnimationFrame(gameLoop);
 }

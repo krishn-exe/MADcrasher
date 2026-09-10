@@ -11,7 +11,6 @@ class Player {
 	}
 }
 
-
 if (!localStorage.getItem('players')) {
 	localStorage.setItem('players', JSON.stringify([
 		{ name: 'James bond', highscore: 200 },
@@ -19,7 +18,6 @@ if (!localStorage.getItem('players')) {
 		{ name: 'Ghost Rider', highscore: 250 },
 	]));
 }
-
 
 let players = JSON.parse(localStorage.getItem('players')) || [];
 players.sort((a, b) => b.highscore - a.highscore);
