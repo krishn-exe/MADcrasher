@@ -20,59 +20,70 @@ const RD = new Renderer(ctx);
 const EM = new EntityManager();
 
 
-function createBikeSprite(){
+function createBikeSprite() {
     const sCanvas = document.createElement('canvas');
-    sCanvas.width = 120;
-    sCanvas.height = 90;
+    sCanvas.width = 110;
+    sCanvas.height = 80;
     const sCtx = sCanvas.getContext('2d');
 
-   
-    sCtx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    
+    sCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     sCtx.beginPath();
-    sCtx.ellipse(55, 60, 35, 14, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.ellipse(55, 52, 38, 12, -Math.PI / 6, 0, Math.PI * 2);
     sCtx.fill();
 
+    sCtx.fillStyle = '#101015'; 
    
-    sCtx.fillStyle = '#201a40';
     sCtx.beginPath();
-    sCtx.moveTo(20, 55);
-    sCtx.lineTo(95, 22);
-    sCtx.lineTo(105, 30);
-    sCtx.lineTo(30, 68);
-    sCtx.closePath();
+    sCtx.ellipse(32, 54, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.fill();
+    
+    sCtx.beginPath();
+    sCtx.ellipse(78, 30, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.fill();
+
+    
+    sCtx.fillStyle = '#00f0ff';
+    sCtx.beginPath();
+    sCtx.arc(32, 54, 4, 0, Math.PI * 2);
+    sCtx.arc(78, 30, 4, 0, Math.PI * 2);
     sCtx.fill();
 
     
     sCtx.fillStyle = '#e61c38'; 
     sCtx.beginPath();
-    sCtx.moveTo(105, 20); 
-    sCtx.lineTo(70, 52);  
-    sCtx.lineTo(25, 62);  
-    sCtx.lineTo(12, 48);  
-    sCtx.lineTo(45, 18);  
+    sCtx.moveTo(96, 20); 
+    sCtx.lineTo(65, 42);
+    sCtx.lineTo(24, 52); 
+    sCtx.lineTo(34, 58); 
+    sCtx.lineTo(76, 36); 
     sCtx.closePath();
     sCtx.fill();
 
+    
     sCtx.fillStyle = '#3a3ab5';
     sCtx.beginPath();
-    sCtx.moveTo(50, 24);
-    sCtx.lineTo(90, 24);
-    sCtx.lineTo(60, 44);
-    sCtx.lineTo(30, 44);
+    sCtx.moveTo(48, 26);
+    sCtx.lineTo(82, 26);
+    sCtx.lineTo(60, 42);
+    sCtx.lineTo(32, 42);
     sCtx.closePath();
     sCtx.fill();
 
+    
     sCtx.fillStyle = '#00f0ff';
     sCtx.beginPath();
-    sCtx.ellipse(72, 26, 14, 6, -Math.PI / 8, 0, Math.PI * 2);
+    sCtx.ellipse(68, 25, 12, 6, -Math.PI / 8, 0, Math.PI * 2);
     sCtx.fill();
 
-    sCtx.fillStyle = '#ffcc00';
-    sCtx.fillRect(14, 52, 10, 6);
-    sCtx.fillRect(26, 58, 10, 6);
+    
+    sCtx.fillStyle = '#ffaa00';
+    sCtx.fillRect(18, 48, 8, 5);
 
     return sCanvas;
 }
+
+
 
 const bikeSprite = createBikeSprite();  
 
@@ -127,18 +138,18 @@ class RoadSegment {
     }
 
     draw(ctx) {
-        // 1. Four Corners of the road surface
+        
         const pBack  = RD.screenCoords(this.x, this.y + this.length, this.z);
         const pRight = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
         const pFront = RD.screenCoords(this.x + this.width, this.y, this.z);
         const pLeft  = RD.screenCoords(this.x, this.y, this.z);
 
-        // 2. 3D Elevation Drop-off Wall
+        
         const dropZ = -8;
         const pFrontDrop = RD.screenCoords(this.x + this.width, this.y, this.z + dropZ);
         const pLeftDrop  = RD.screenCoords(this.x, this.y, this.z + dropZ);
 
-        ctx.fillStyle = '#221c38'; // Dark 3D Side Cliff
+        ctx.fillStyle = '#221c38'; 
         ctx.beginPath();
         ctx.moveTo(pLeft.x, pLeft.y);
         ctx.lineTo(pFront.x, pFront.y);
@@ -147,7 +158,7 @@ class RoadSegment {
         ctx.closePath();
         ctx.fill();
 
-        // 3. Main Solid Concrete Surface (Authentic 1984 Grey/Slate)
+        
         ctx.fillStyle = '#4e4868';
         ctx.beginPath();
         ctx.moveTo(pBack.x, pBack.y);
@@ -157,7 +168,7 @@ class RoadSegment {
         ctx.closePath();
         ctx.fill();
 
-        // 4. Authentic 1984 Light-Purple Bevel Edge Trim (Upper Rail)
+       
         ctx.strokeStyle = '#8278a8';
         ctx.lineWidth = 6;
         ctx.beginPath();
@@ -165,7 +176,7 @@ class RoadSegment {
         ctx.lineTo(pBack.x, pBack.y);
         ctx.stroke();
 
-        // 5. Lower Bevel Edge Trim
+        
         ctx.strokeStyle = '#322c4c';
         ctx.lineWidth = 6;
         ctx.beginPath();
@@ -206,12 +217,12 @@ class Vehicle {
         this.type = type;
         this.x = x;
         this.y = y;
-        this.z = 20; 
+        this.z = 5; 
         this.speed = 0.1;
         this.width = 1;
         this.length = 1.5;
 
-        this.groundZ= 20;
+        this.groundZ= 5;
         this.vz= 0;
         this.isJumping = false;
 
@@ -300,7 +311,7 @@ class Vehicle {
        ctx.drawImage(
         bikeSprite,
         center.x - spriteWidth/2,
-        center.y - spriteHeight/2,
+        center.y - 25,
         spriteWidth,
         spriteHeight
        );
@@ -334,8 +345,8 @@ function gameLoop() {
         if(entity instanceof RoadSegment){
             entity.update(scrollSpeed);
 
-            if(entity.y + entity.length < -2){
-                entity.y = 10;
+            if(entity.y + entity.length < 0){
+                entity.y += 20;
             }
         }
     }
