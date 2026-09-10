@@ -85,7 +85,67 @@ function createBikeSprite() {
 
 
 
-const bikeSprite = createBikeSprite();  
+const bikeSprite = createBikeSprite();
+
+function createEnemySprite() {
+    const sCanvas = document.createElement('canvas');
+    sCanvas.width = 110;
+    sCanvas.height = 80;
+    const sCtx = sCanvas.getContext('2d');
+
+    
+    sCtx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    sCtx.beginPath();
+    sCtx.ellipse(55, 48, 42, 12, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.fill();
+
+    
+    sCtx.fillStyle = '#101015';
+    sCtx.beginPath();
+    sCtx.ellipse(32, 54, 15, 8, -Math.PI / 6, 0, Math.PI * 2); // Front tire (closer to player)
+    sCtx.ellipse(78, 30, 15, 8, -Math.PI / 6, 0, Math.PI * 2); // Rear tire
+    sCtx.fill();
+
+    
+    sCtx.fillStyle = '#00e676';
+    sCtx.beginPath();
+    sCtx.moveTo(18, 56);
+    sCtx.lineTo(45, 38);
+    sCtx.lineTo(92, 18); 
+    sCtx.lineTo(82, 32);
+    sCtx.lineTo(35, 58);
+    sCtx.closePath();
+    sCtx.fill();
+
+   
+    sCtx.fillStyle = '#4a148c';
+    sCtx.beginPath();
+    sCtx.moveTo(35, 44);
+    sCtx.lineTo(75, 24);
+    sCtx.lineTo(65, 38);
+    sCtx.lineTo(30, 52);
+    sCtx.closePath();
+    sCtx.fill();
+
+    
+    sCtx.fillStyle = '#ff1744';
+    sCtx.beginPath();
+    sCtx.ellipse(45, 40, 12, 5, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.fill();
+
+   
+    sCtx.fillStyle = '#ffff00';
+    sCtx.beginPath();
+    sCtx.arc(20, 54, 3, 0, Math.PI * 2);
+    sCtx.arc(26, 58, 3, 0, Math.PI * 2);
+    sCtx.fill();
+
+    return sCanvas;
+}
+
+
+const enemySprite = createEnemySprite();
+
 
 const stars = [];
 const starCount = 60;
@@ -326,6 +386,54 @@ class Vehicle {
     }
 }
 
+class Enemy {
+    constructor(x, y) {
+        this.type = 'enemy';
+        this.x = x;
+        this.y = y;
+        this.z = 5; 
+        this.width = 1;
+        this.length = 1.5;
+        this.speed = 0.04;
+    }
+
+    update(scrollSpeed) {
+    
+        this.y -= (this.speed + scrollSpeed);
+
+    
+        if (this.y < -2) {
+            this.respawn();
+        }
+    }
+
+    respawn() {
+        this.y = 22 + Math.random() * 6; 
+        this.x = 6.0 + Math.random() * 4.5; 
+    }
+
+           draw(ctx) {
+        const center = RD.screenCoords(
+            this.x + this.width / 2,
+            this.y + this.length / 2,
+            this.z
+        );
+
+        const spriteWidth = 105;
+        const spriteHeight = 78;
+
+        ctx.drawImage(
+            enemySprite,
+            center.x - spriteWidth / 2,
+            center.y - 25,
+            spriteWidth,
+            spriteHeight
+        );
+    }
+
+}
+
+
 
 
 //Entities
@@ -335,6 +443,17 @@ EM.entities.push(new RoadSegment(5, 10));
 
 const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.entities.push(playerVehicle);
+
+
+const enemies = [
+    new Enemy(7.0, 16),
+    new Enemy(9.5, 23)
+];
+
+for (const enemy of enemies) {
+    EM.entities.push(enemy);
+}
+
 
 // Game loop
 function gameLoop() {
@@ -350,6 +469,11 @@ function gameLoop() {
             }
         }
     }
+
+        for (const enemy of enemies) {
+        enemy.update(scrollSpeed);
+    }
+
 
     playerVehicle.update();
     RD.render(EM.entities);
