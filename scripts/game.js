@@ -213,14 +213,15 @@ class Bullet {
 }
 
 class Vehicle {
-    constructor(type, x = 8, y = 5) {
-        this.type = type;
+    constructor(type, x, y) {
+        this.type = type
         this.x = x;
         this.y = y;
         this.z = 5; 
         this.speed = 0.1;
         this.width = 1;
         this.length = 1.5;
+        this.height = 1;
 
         this.groundZ= 5;
         this.vz= 0;
@@ -244,9 +245,9 @@ class Vehicle {
             if(IM.isDown('KeyS') || IM.isDown('ArrowDown')) {
                 this.y -= this.speed;
             }
-            if(IM.isDown('Space') && !this.isJumping){
+            if(IM.isJustPressed('Space')){
                 this.isJumping = true;
-                this.vz=2.5;
+                this.vz=4;
             }
 
             if(this.isJumping){
@@ -266,7 +267,7 @@ class Vehicle {
 
             }
 
-            if(IM.isDown('KeyZ') && this.shootCoolDown === 0){
+            if(IM.isDown('KeyE') && this.shootCoolDown === 0){
                 const bullet = new Bullet(
                     this.x + this.width /2,
                     this.y + this.length,
@@ -326,15 +327,79 @@ class Vehicle {
     }
 }
 
+class Obstacle {
+    constructor(x, y, z, width = 1, length = 1) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.width = width;
+        this.length = length;
+        this.height = 1;
+        this.type = 'obstacle';
 
 
-//Entities
+    }
 
-EM.entities.push(new RoadSegment(5, 0));
-EM.entities.push(new RoadSegment(5, 10));
+    draw(ctx) {
+        let pBack = RD.screenCoords(this.x, this.y + this.length, this.z);
+        let pRight = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
+        let pFront = RD.screenCoords(this.x + this.width, this.y, this.z);
+        let pLeft = RD.screenCoords(this.x, this.y, this.z);
 
+        ctx.fillStyle = '#8B0000';
+        ctx.beginPath();
+        ctx.moveTo(pBack.x, pBack.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pLeft.x, pLeft.y);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
+let roadSegmentCount = 0;
+let nextJumpAt = 12 + Math.floor(Math.random() * 4);
+let highestY = 0;
+
+function getNextGap() {
+    roadSegmentCount++;
+    if (roadSegmentCount >= nextJumpAt) {
+        nextJumpAt = roadSegmentCount + 12 + Math.floor(Math.random() * 4);
+        return 7.0; 
+    }
+    return 0;
+}
+
+// Initial Road segments
+const roadCount = 10;
+for (let i = 0; i < roadCount; i++) {
+    const gap = getNextGap();
+    EM.add(new RoadSegment(5, highestY, 7, 10));
+    highestY += 10 + gap;
+}
+
+// Segment updates
+function updateRoads(scrollSpeed = 0.1) {
+    highestY -= scrollSpeed;
+
+    for (const road of EM.roads) {
+        road.update(scrollSpeed);
+
+        if (road.y + road.length < -15) {
+            const gap = getNextGap();
+            road.y = highestY + gap;
+            highestY = road.y + road.length;
+        }
+    }
+}
+
+// Player entity
 const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.entities.push(playerVehicle);
+
+//Obstacle entity
+const obstacle = new Obstacle(7, 10, 20);
+EM.entities.push(obstacle);
 
 // Game loop
 function gameLoop() {
