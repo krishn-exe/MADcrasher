@@ -113,28 +113,42 @@ function drawStarField(ctx) {
 }
 
 class RoadSegment {
-    constructor(x, y , width = 7, length = 10) {
+    constructor(x, y, width = 7, length = 10) {
         this.x = x;       
         this.y = y;               
         this.z = 0;               
         this.width = width;
         this.length = length;
-
-        this.topColor = '#3d4452';
+        this.topColor = '#4e4868';
     }
 
-    update(speed){
-        this.y = this.y-speed;
+    update(speed) {
+        this.y = this.y - speed;
     }
 
     draw(ctx) {
+        // 1. Four Corners of the road surface
+        const pBack  = RD.screenCoords(this.x, this.y + this.length, this.z);
+        const pRight = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
+        const pFront = RD.screenCoords(this.x + this.width, this.y, this.z);
+        const pLeft  = RD.screenCoords(this.x, this.y, this.z);
 
-        const pBack   = RD.screenCoords(this.x, this.y + this.length, this.z);
-        const pRight  = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
-        const pFront  = RD.screenCoords(this.x + this.width, this.y, this.z);
-        const pLeft   = RD.screenCoords(this.x, this.y, this.z);
+        // 2. 3D Elevation Drop-off Wall
+        const dropZ = -8;
+        const pFrontDrop = RD.screenCoords(this.x + this.width, this.y, this.z + dropZ);
+        const pLeftDrop  = RD.screenCoords(this.x, this.y, this.z + dropZ);
 
-        ctx.fillStyle = this.topColor;
+        ctx.fillStyle = '#221c38'; // Dark 3D Side Cliff
+        ctx.beginPath();
+        ctx.moveTo(pLeft.x, pLeft.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pFrontDrop.x, pFrontDrop.y);
+        ctx.lineTo(pLeftDrop.x, pLeftDrop.y);
+        ctx.closePath();
+        ctx.fill();
+
+        // 3. Main Solid Concrete Surface (Authentic 1984 Grey/Slate)
+        ctx.fillStyle = '#4e4868';
         ctx.beginPath();
         ctx.moveTo(pBack.x, pBack.y);
         ctx.lineTo(pRight.x, pRight.y);
@@ -143,24 +157,38 @@ class RoadSegment {
         ctx.closePath();
         ctx.fill();
 
+        // 4. Authentic 1984 Light-Purple Bevel Edge Trim (Upper Rail)
+        ctx.strokeStyle = '#8278a8';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(pLeft.x, pLeft.y);
+        ctx.lineTo(pBack.x, pBack.y);
+        ctx.stroke();
+
+        // 5. Lower Bevel Edge Trim
+        ctx.strokeStyle = '#322c4c';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(pFront.x, pFront.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.stroke();
     }
 }
 
-class Bullet{
-    constructor(x, y, z){
+class Bullet {
+    constructor(x, y, z) {
         this.x = x;
-        this.y=y;
-        this.z=z;
-        this.speed=0.6;
-        this.length=1.0;
+        this.y = y;
+        this.z = z;
+        this.speed = 0.6;
+        this.length = 1.0;
     }
 
-    update(){
+    update() {
         this.y = this.y + this.speed;
-
     }
 
-    draw(ctx){
+    draw(ctx) {
         const start = RD.screenCoords(this.x, this.y, this.z);
         const tip = RD.screenCoords(this.x, this.y + this.length, this.z);
 
