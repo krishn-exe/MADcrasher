@@ -1,5 +1,3 @@
-// Load references to the HTML elements
-
 const playerNameInput = document.getElementById('playerName');
 const startButton = document.getElementById('startGameBtn');
 const highScoreTable = document.getElementById('highScoreList');
@@ -33,8 +31,6 @@ highScoreTable.innerHTML = topPlayers.map((player) => `
 	</tr>
 `).join('');
 
-
-//Store player name and score in local storage
 
 startButton.addEventListener('click', () => {
 	const name = playerNameInput.value.trim();

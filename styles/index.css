@@ -13,10 +13,6 @@ body{
     min-height: 100vh;
 }
 
-/* main menu container styles */
-
-/* Game title styles */
-
 .game-title{
     display:flex;
     flex-direction: column;
@@ -52,8 +48,6 @@ body{
     -webkit-text-stroke: 1px #dfd9b241;
 }
 
-/* Container styles */
-
 .container{
     display: flex;
     flex-direction: row;
@@ -63,8 +57,6 @@ body{
     width: 100vw;
     padding: 2rem 0.5rem;
 }
-
-/*High score table*/
 
 .high-score{
     width: 650px;
@@ -101,8 +93,6 @@ body{
     color: #f8cf17;
     font-size: 0.75rem;
 }
-
-/* Game launcher styles */
 
 .game-launcher{
     display: flex;
@@ -151,8 +141,6 @@ body{
     font-size: 1rem;
     cursor: pointer;
 }
-
-/* Game Over styles */
 
 #playAgainBtn,
 #mainMenuBtn,

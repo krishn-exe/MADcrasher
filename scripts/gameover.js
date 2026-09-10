@@ -1,4 +1,3 @@
-// Retrieve player name and score from query params or localStorage
 const urlParams = new URLSearchParams(window.location.search);
 const urlPlayer = urlParams.get('player-name');
 const urlScore = urlParams.get('score');
@@ -8,7 +7,6 @@ const score = (urlScore !== null && urlScore !== '')
     ? parseInt(urlScore, 10)
     : (parseInt(localStorage.getItem('lastScore'), 10) || 0);
 
-// UI elements
 const playerNameDisplay = document.getElementById('playerNameDisplay');
 const finalScoreDisplay = document.getElementById('finalScoreDisplay');
 const highScoreBanner = document.getElementById('highScoreBanner');
@@ -16,11 +14,9 @@ const highScoreList = document.getElementById('highScoreList');
 const playAgainBtn = document.getElementById('playAgainBtn');
 const mainMenuBtn = document.getElementById('mainMenuBtn');
 
-// Set mission report stats
 if (playerNameDisplay) playerNameDisplay.textContent = playerName;
 if (finalScoreDisplay) finalScoreDisplay.textContent = score.toString();
 
-// Initialize default high scores if not present
 if (!localStorage.getItem('players')) {
     localStorage.setItem('players', JSON.stringify([
         { name: 'James bond', highscore: 200 },
@@ -51,7 +47,6 @@ if (isNewHighScore && score > 0 && highScoreBanner) {
     highScoreBanner.style.display = 'block';
 }
 
-// Populate Top 5 high scores table
 players.sort((a, b) => b.highscore - a.highscore);
 const topPlayers = players.slice(0, 5);
 
@@ -70,7 +65,6 @@ if (highScoreList) {
     }).join('');
 }
 
-// Button actions
 if (playAgainBtn) {
     playAgainBtn.addEventListener('click', () => {
         window.location.href = `game.html?player-name=${encodeURIComponent(playerName)}`;

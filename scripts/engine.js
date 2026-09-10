@@ -1,5 +1,3 @@
-// Input Manager
-
 export class InputManager {
   constructor() {
     this.keysDown = new Set();
@@ -158,7 +156,6 @@ export class EntityManager {
             enemyPileups: [],
         };
 
-        //Player collisions
         if (this.player) {
             for (let i = 0; i < this.enemies.length; i++) {
                 const enemy = this.enemies[i];
@@ -188,9 +185,6 @@ export class EntityManager {
                 }
             }
         }
-
-
-        // Enemy collisions
 
         for (let i = 0; i < this.bullets.length; i++) {
             const bullet = this.bullets[i];

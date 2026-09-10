@@ -1,8 +1,6 @@
-// Module imports
 import { InputManager, Renderer, EntityManager} from './engine.js';
 
 
-// Canvas setup 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -19,7 +17,6 @@ const IM = new InputManager();
 const RD = new Renderer(ctx);
 const EM = new EntityManager();
 
-// Player information
 const urlParams = new URLSearchParams(window.location.search);
 const playerName = urlParams.get('player-name') || localStorage.getItem('currentPlayer') || 'Player';
 localStorage.setItem('currentPlayer', playerName);
@@ -107,8 +104,8 @@ function createEnemySprite() {
     
     sCtx.fillStyle = '#101015';
     sCtx.beginPath();
-    sCtx.ellipse(32, 54, 15, 8, -Math.PI / 6, 0, Math.PI * 2); // Front tire (closer to player)
-    sCtx.ellipse(78, 30, 15, 8, -Math.PI / 6, 0, Math.PI * 2); // Rear tire
+    sCtx.ellipse(32, 54, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.ellipse(78, 30, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
     sCtx.fill();
 
     
@@ -157,13 +154,11 @@ function createDestroyedBikeSprite() {
     sCanvas.height = 80;
     const sCtx = sCanvas.getContext('2d');
 
-    // Scorch shadow
     sCtx.fillStyle = 'rgba(255, 60, 0, 0.4)';
     sCtx.beginPath();
     sCtx.ellipse(55, 52, 40, 14, 0, 0, Math.PI * 2);
     sCtx.fill();
 
-    // Outer explosion burst
     sCtx.fillStyle = '#ff3d00';
     sCtx.beginPath();
     sCtx.arc(55, 42, 24, 0, Math.PI * 2);
@@ -171,7 +166,6 @@ function createDestroyedBikeSprite() {
     sCtx.arc(70, 38, 16, 0, Math.PI * 2);
     sCtx.fill();
 
-    // Inner fiery core
     sCtx.fillStyle = '#ffea00';
     sCtx.beginPath();
     sCtx.arc(55, 42, 15, 0, Math.PI * 2);
@@ -179,13 +173,11 @@ function createDestroyedBikeSprite() {
     sCtx.arc(64, 40, 9, 0, Math.PI * 2);
     sCtx.fill();
 
-    // Hot white flash
     sCtx.fillStyle = '#ffffff';
     sCtx.beginPath();
     sCtx.arc(55, 42, 7, 0, Math.PI * 2);
     sCtx.fill();
 
-    // Debris fragments
     sCtx.fillStyle = '#00f0ff';
     sCtx.fillRect(26, 24, 6, 5);
     sCtx.fillRect(78, 22, 6, 5);
@@ -203,13 +195,11 @@ function createDestroyedEnemySprite() {
     sCanvas.height = 80;
     const sCtx = sCanvas.getContext('2d');
 
-    // Scorch shadow
     sCtx.fillStyle = 'rgba(0, 230, 118, 0.3)';
     sCtx.beginPath();
     sCtx.ellipse(55, 50, 40, 14, 0, 0, Math.PI * 2);
     sCtx.fill();
 
-    // Outer plasma burst
     sCtx.fillStyle = '#ff1744';
     sCtx.beginPath();
     sCtx.arc(55, 42, 24, 0, Math.PI * 2);
@@ -217,7 +207,6 @@ function createDestroyedEnemySprite() {
     sCtx.arc(72, 36, 16, 0, Math.PI * 2);
     sCtx.fill();
 
-    // Inner green/neon blast
     sCtx.fillStyle = '#00e676';
     sCtx.beginPath();
     sCtx.arc(55, 42, 14, 0, Math.PI * 2);
@@ -225,13 +214,11 @@ function createDestroyedEnemySprite() {
     sCtx.arc(64, 38, 8, 0, Math.PI * 2);
     sCtx.fill();
 
-    // White core
     sCtx.fillStyle = '#ffffff';
     sCtx.beginPath();
     sCtx.arc(55, 42, 6, 0, Math.PI * 2);
     sCtx.fill();
 
-    // Debris
     sCtx.fillStyle = '#ffff00';
     sCtx.fillRect(30, 28, 5, 5);
     sCtx.fillRect(75, 26, 6, 5);
@@ -375,8 +362,8 @@ class Vehicle {
         this.z = 5; 
         this.baseSpeed = 0.12;
         this.maxSpeed = 0.28;
-        this.accelerationRate = 0.007; // Smooth acceleration while on boost pad
-        this.decelerationRate = 0.003; // Smooth deceleration after leaving boost pad
+        this.accelerationRate = 0.007;
+        this.decelerationRate = 0.003;
         this.speed = this.baseSpeed;
         this.width = 1;
         this.length = 1.5;
@@ -389,15 +376,12 @@ class Vehicle {
         this.bullets = [];
         this.shootCoolDown = 0;
 
-        // Flags & Frame Counters
         this.isDestroyed = false;
-        this.destroyFrames = 30; // duration in frames to show destroyed sprite
+        this.destroyFrames = 30;
         this.destroyTimer = 0;
 
-        // Lives system (starts with 3 lives)
         this.lives = 3;
 
-        // Boost Pad: active only while colliding
         this.isOnBoostPad = false;
     }
 
@@ -419,13 +403,11 @@ class Vehicle {
             this.destroyTimer--;
             if (this.destroyTimer <= 0) {
                 this.destroyTimer = 0;
-                // If lives are exhausted, trigger Game Over
                 if (this.lives <= 0) {
                     triggerGameOver();
                     return;
                 }
                 this.isDestroyed = false;
-                // Reset player position and boosts after destruction
                 this.x = 6.5;
                 this.y = 4;
                 this.z = this.groundZ;
@@ -437,7 +419,6 @@ class Vehicle {
             return;
         }
 
-        // Boost pad acceleration and smooth deceleration
         if (this.isOnBoostPad) {
             this.speed = Math.min(this.maxSpeed, this.speed + this.accelerationRate);
         } else if (this.speed > this.baseSpeed) {
@@ -515,7 +496,6 @@ class Vehicle {
        const spriteWidth = 105;
        const spriteHeight = 78; 
 
-        // Boost thruster flames behind the bike when boosted (smoothly scales with speed)
         const boostAmount = this.speed - this.baseSpeed;
         if (boostAmount > 0.005) {
             const boostRatio = Math.min(1.0, boostAmount / (this.maxSpeed - this.baseSpeed));
@@ -561,7 +541,7 @@ class Enemy {
         this.speed = 0.04;
 
         this.isDestroyed = false;
-        this.destroyFrames = 30; // duration in frames to show destroyed sprite
+        this.destroyFrames = 30;
         this.destroyTimer = 0;
     }
 
@@ -574,7 +554,6 @@ class Enemy {
     update(scrollSpeed) {
         if (this.isDestroyed) {
             if (this.destroyTimer === 0) this.destroyTimer = this.destroyFrames;
-            // Drift with the road while destroyed
             this.y -= scrollSpeed;
             this.destroyTimer--;
             if (this.destroyTimer <= 0) {
@@ -626,10 +605,10 @@ class BoostPad {
         this.subType = 'pad';
         this.x = x;
         this.y = y;
-        this.z = 0.05; // Placed on the road surface
+        this.z = 0.05;
         this.length = length;
         this.width = width;
-        this.height = 6.0; // High enough to intersect grounded vehicle at z=5
+        this.height = 6.0;
 
         this.animTimer = Math.random() * Math.PI * 2;
     }
@@ -645,7 +624,7 @@ class BoostPad {
 
     respawn() {
         this.y = 35 + Math.random() * 20;
-        this.x = 6.5 + Math.random() * 2.0; // Stays centered on the road (minX=5, maxX=12)
+        this.x = 6.5 + Math.random() * 2.0;
     }
 
     draw(ctx) {
@@ -663,7 +642,6 @@ class BoostPad {
         ctx.closePath();
         ctx.fill();
 
-        // Static direction arrows on the pad surface.
         const arrowLength = 1.2;
         const arrowWidth = 0.7;
         const arrowPositions = [
@@ -689,7 +667,6 @@ class BoostPad {
             ctx.fill();
         }
 
-        // Neon border
         ctx.strokeStyle = '#ff9900';
         ctx.lineWidth = 3;
         ctx.stroke();
@@ -699,13 +676,10 @@ class BoostPad {
 const Boost = BoostPad;
 const boosts = BoostPad;
 
-//Entities
-
 const roadSegments = [
     new RoadSegment(5, 0, 7, 10),
     new RoadSegment(5, 10, 7, 10),
 
-    // Gap of 4 world units
     new RoadSegment(5, 24, 7, 10),
     new RoadSegment(5, 34, 7, 10)
 ];
@@ -717,7 +691,6 @@ for (const road of roadSegments) {
 const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.add(playerVehicle);
 
-// Debug interface for tests and telemetry
 window.__MAD_CRASHER__ = {
     player: playerVehicle,
     getScore: () => score,
@@ -736,7 +709,6 @@ for (const enemy of enemies) {
     EM.add(enemy);
 }
 
-// Boost pads on the road
 const boostPads = [
     new BoostPad(6.0, 14, 10.0, 3.0),
     new BoostPad(6.8, 38, 10.0, 3.0)
@@ -750,9 +722,8 @@ let score = 0;
 let lastScoreTime = Date.now();
 let isGameOver = false;
 
-// Progressive scroll speed: increases every 10 seconds of active survival
 let baseScrollSpeed = 0.08;
-const scrollSpeedIncrement = 0.012; // +0.012 every 10 seconds
+const scrollSpeedIncrement = 0.012;
 const maxBaseScrollSpeed = 0.22;
 let lastSpeedIncreaseTime = Date.now();
 
@@ -760,10 +731,8 @@ function triggerGameOver() {
     if (isGameOver) return;
     isGameOver = true;
 
-    // Save final score
     localStorage.setItem('lastScore', score.toString());
 
-    // Update player highscore in localStorage if higher
     try {
         let players = JSON.parse(localStorage.getItem('players')) || [];
         let player = players.find(p => p.name.toLowerCase() === playerName.toLowerCase());
@@ -779,17 +748,14 @@ function triggerGameOver() {
         console.error('Failed to update players highscore:', err);
     }
 
-    // Forward to gameover.html
     window.location.href = `gameover.html?score=${score}&player-name=${encodeURIComponent(playerName)}`;
 }
 
-// Game loop
 function gameLoop() {
     if (isGameOver) return;
 
     const now = Date.now();
 
-    // Score increment: +10 points for every second survived while alive
     if (!playerVehicle.isDestroyed && playerVehicle.lives > 0) {
         if (now - lastScoreTime >= 1000) {
             const elapsedSeconds = Math.floor((now - lastScoreTime) / 1000);
@@ -797,7 +763,6 @@ function gameLoop() {
             lastScoreTime += elapsedSeconds * 1000;
         }
 
-        // Progressive scroll speed: increases every 10 seconds
         if (now - lastSpeedIncreaseTime >= 10000) {
             const intervals = Math.floor((now - lastSpeedIncreaseTime) / 10000);
             baseScrollSpeed = Math.min(maxBaseScrollSpeed, baseScrollSpeed + intervals * scrollSpeedIncrement);
@@ -810,7 +775,6 @@ function gameLoop() {
 
     drawStarField(ctx);
 
-    // Dynamic scroll speed: scales smoothly as player accelerates and decelerates
     const speedRatio = playerVehicle.speed / playerVehicle.baseSpeed;
     const scrollSpeed = baseScrollSpeed * speedRatio;
 
@@ -834,7 +798,6 @@ function gameLoop() {
 
     playerVehicle.update();
 
-    // Road check: destroy player if there is no road segment under the player and not in jumping state
     const px = playerVehicle.x + playerVehicle.width / 2;
     const py = playerVehicle.y + playerVehicle.length / 2;
     let isOnRoad = false;
@@ -855,32 +818,26 @@ function gameLoop() {
 
     const collisions = EM.getCollisions();
 
-    // Bullet-to-Enemy Collision Check
     for (let bIndex = playerVehicle.bullets.length - 1; bIndex >= 0; bIndex--) {
         const bullet = playerVehicle.bullets[bIndex];
 
         for (const enemy of enemies) {
             if (enemy.isDestroyed) continue;
 
-            // AABB hit distance check in world coordinates
             const dx = Math.abs(bullet.x - (enemy.x + enemy.width / 2));
             const dy = Math.abs(bullet.y - (enemy.y + enemy.length / 2));
 
             if (dx < 1.0 && dy < 1.2) {
-                // HIT! Remove the bullet
                 playerVehicle.bullets.splice(bIndex, 1);
 
-                // Destroy the enemy (plays destruction animation for specified frames before respawning)
                 enemy.destroy();
 
-                // Award points
                 score += 150;
                 break;
             }
         }
     }
 
-    // Enemy to player collision check
     for (const enemy of collisions.playerWithEnemy){
         if (!enemy.isDestroyed && !playerVehicle.isDestroyed) {
             enemy.destroy();
@@ -888,25 +845,21 @@ function gameLoop() {
         }
     }
 
-    // Player and boost pad collision check: active only while colliding
     playerVehicle.isOnBoostPad = collisions.playerWithBoosts.length > 0;
 
     RD.render(EM.entities);
     IM.update();
 
-    // Draw Retro Arcade HUD
     ctx.save();
     ctx.shadowColor = '#000000';
     ctx.shadowBlur = 4;
     ctx.shadowOffsetX = 2;
     ctx.shadowOffsetY = 2;
 
-    // Score
     ctx.fillStyle = '#f8cf17';
     ctx.font = 'bold 16px "Press Start 2P", "Courier New", monospace';
     ctx.fillText(`SCORE: ${score}`, 25, 40);
 
-    // Lives
     ctx.fillStyle = '#f8cf17';
     ctx.fillText('LIVES:', 25, 72);
     for (let i = 0; i < 3; i++) {
@@ -914,12 +867,10 @@ function gameLoop() {
         ctx.fillText('♥', 125 + i * 26, 72);
     }
 
-    // Pilot
     ctx.fillStyle = '#00f0ff';
     ctx.font = '12px "Press Start 2P", "Courier New", monospace';
     ctx.fillText(`PILOT: ${playerName}`, 25, 102);
 
-    // Speed progression
     const speedMultiplier = (baseScrollSpeed / 0.08).toFixed(1);
     ctx.fillStyle = '#ffaa00';
     ctx.font = '11px "Press Start 2P", "Courier New", monospace';
