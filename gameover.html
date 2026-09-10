@@ -20,24 +20,12 @@
     </div>
     <div class="container">
       <div class="game-launcher">
-        <h2>MISSION REPORT</h2>
-        <div class="game-over-stats">
-          <div class="stat-line">
-            <span>PILOT:</span>
-            <span id="playerNameDisplay" class="highlight">Player</span>
-          </div>
-          <div class="stat-line">
-            <span>SCORE:</span>
-            <span id="finalScoreDisplay" class="score-highlight">0</span>
-          </div>
-          <div id="highScoreBanner" class="new-high-score-banner" style="display: none;">
-            ★ NEW HIGH SCORE! ★
-          </div>
-        </div>
-        <div class="game-over-actions">
-          <button id="playAgainBtn" class="arcade-btn" type="button">PLAY AGAIN</button>
-          <button id="mainMenuBtn" class="arcade-btn secondary-btn" type="button">MAIN MENU</button>
-        </div>
+        <h2>Mission Report</h2>
+        <p>Pilot : <span id="playerNameDisplay">Player</span></p>
+        <p>Score : <span id="finalScoreDisplay">0</span></p>
+        <p id="highScoreBanner" style="display: none;">New High Score!</p>
+        <button id="playAgainBtn" type="button">Play Again</button>
+        <button id="mainMenuBtn" type="button">Main Menu</button>
       </div>
       <div class="high-score">
         <h2>High Scores</h2>

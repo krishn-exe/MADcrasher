@@ -451,12 +451,6 @@ class Vehicle {
             if (IM.isDown('KeyD') || IM.isDown('ArrowRight')) {
                 this.x -= this.speed;
             }
-            if(IM.isDown('KeyW') || IM.isDown('ArrowUp')){
-                this.y += this.speed;
-            }
-            if(IM.isDown('KeyS') || IM.isDown('ArrowDown')) {
-                this.y -= this.speed;
-            }
             if(IM.isDown('Space') && !this.isJumping){
                 this.isJumping = true;
                 this.vz=4;
