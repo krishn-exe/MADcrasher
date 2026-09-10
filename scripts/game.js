@@ -76,6 +76,42 @@ function createBikeSprite(){
 
 const bikeSprite = createBikeSprite();  
 
+const stars = [];
+const starCount = 60;
+
+for(let i = 0; i< starCount; i++){
+    stars.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        size: Math.random() * 1.5  + 0.5,
+        speed: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.7 + 0.3,
+        
+    })
+}
+
+function drawStarField(ctx) {
+    ctx.fillStyle = '#08082a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle =  '#ffffff';
+    for(const s of stars){
+        ctx.globalAlpha = s.alpha;
+        ctx.fillRect(s.x, s.y, s.size, s.size);
+        
+        s.y = s.y + s.speed;
+        
+        if(s.y > canvas.height){
+        s.y = 0;    
+        s.x = Math.random() * canvas.width;
+       }
+    }
+
+    ctx.globalAlpha = 1.0;
+
+    
+}
+
 class RoadSegment {
     constructor(x, y , width = 7, length = 10) {
         this.x = x;       
@@ -263,8 +299,7 @@ EM.entities.push(playerVehicle);
 
 // Game loop
 function gameLoop() {
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawStarField(ctx);
 
     const scrollSpeed = 0.08;
     for(const entity of EM.entities){
