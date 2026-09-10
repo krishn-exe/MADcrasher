@@ -20,86 +20,146 @@ const RD = new Renderer(ctx);
 const EM = new EntityManager();
 
 
-function createBikeSprite(){
+function createBikeSprite() {
     const sCanvas = document.createElement('canvas');
-    sCanvas.width = 120;
-    sCanvas.height = 90;
+    sCanvas.width = 110;
+    sCanvas.height = 80;
     const sCtx = sCanvas.getContext('2d');
 
-   
-    sCtx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    
+    sCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     sCtx.beginPath();
-    sCtx.ellipse(55, 60, 35, 14, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.ellipse(55, 52, 38, 12, -Math.PI / 6, 0, Math.PI * 2);
     sCtx.fill();
 
+    sCtx.fillStyle = '#101015'; 
    
-    sCtx.fillStyle = '#201a40';
     sCtx.beginPath();
-    sCtx.moveTo(20, 55);
-    sCtx.lineTo(95, 22);
-    sCtx.lineTo(105, 30);
-    sCtx.lineTo(30, 68);
-    sCtx.closePath();
+    sCtx.ellipse(32, 54, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.fill();
+    
+    sCtx.beginPath();
+    sCtx.ellipse(78, 30, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
+    sCtx.fill();
+
+    
+    sCtx.fillStyle = '#00f0ff';
+    sCtx.beginPath();
+    sCtx.arc(32, 54, 4, 0, Math.PI * 2);
+    sCtx.arc(78, 30, 4, 0, Math.PI * 2);
     sCtx.fill();
 
     
     sCtx.fillStyle = '#e61c38'; 
     sCtx.beginPath();
-    sCtx.moveTo(105, 20); 
-    sCtx.lineTo(70, 52);  
-    sCtx.lineTo(25, 62);  
-    sCtx.lineTo(12, 48);  
-    sCtx.lineTo(45, 18);  
+    sCtx.moveTo(96, 20); 
+    sCtx.lineTo(65, 42);
+    sCtx.lineTo(24, 52); 
+    sCtx.lineTo(34, 58); 
+    sCtx.lineTo(76, 36); 
     sCtx.closePath();
     sCtx.fill();
 
+    
     sCtx.fillStyle = '#3a3ab5';
     sCtx.beginPath();
-    sCtx.moveTo(50, 24);
-    sCtx.lineTo(90, 24);
-    sCtx.lineTo(60, 44);
-    sCtx.lineTo(30, 44);
+    sCtx.moveTo(48, 26);
+    sCtx.lineTo(82, 26);
+    sCtx.lineTo(60, 42);
+    sCtx.lineTo(32, 42);
     sCtx.closePath();
     sCtx.fill();
 
+    
     sCtx.fillStyle = '#00f0ff';
     sCtx.beginPath();
-    sCtx.ellipse(72, 26, 14, 6, -Math.PI / 8, 0, Math.PI * 2);
+    sCtx.ellipse(68, 25, 12, 6, -Math.PI / 8, 0, Math.PI * 2);
     sCtx.fill();
 
-    sCtx.fillStyle = '#ffcc00';
-    sCtx.fillRect(14, 52, 10, 6);
-    sCtx.fillRect(26, 58, 10, 6);
+    
+    sCtx.fillStyle = '#ffaa00';
+    sCtx.fillRect(18, 48, 8, 5);
 
     return sCanvas;
 }
 
+
+
 const bikeSprite = createBikeSprite();  
 
+const stars = [];
+const starCount = 60;
+
+for(let i = 0; i< starCount; i++){
+    stars.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        size: Math.random() * 1.5  + 0.5,
+        speed: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.7 + 0.3,
+        
+    })
+}
+
+function drawStarField(ctx) {
+    ctx.fillStyle = '#08082a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle =  '#ffffff';
+    for(const s of stars){
+        ctx.globalAlpha = s.alpha;
+        ctx.fillRect(s.x, s.y, s.size, s.size);
+        
+        s.y = s.y + s.speed;
+        
+        if(s.y > canvas.height){
+        s.y = 0;    
+        s.x = Math.random() * canvas.width;
+       }
+    }
+
+    ctx.globalAlpha = 1.0;
+
+    
+}
+
 class RoadSegment {
-    constructor(x, y , width = 7, length = 5) {
-        this.type = 'road';
+    constructor(x, y, width = 7, length = 10) {
         this.x = x;       
         this.y = y;               
         this.z = 0;               
         this.width = width;
         this.length = length;
-
-        this.topColor = '#3d4452';
+        this.topColor = '#4e4868';
     }
 
-    update(speed){
-        this.y = this.y-speed;
+    update(speed) {
+        this.y = this.y - speed;
     }
 
     draw(ctx) {
+        
+        const pBack  = RD.screenCoords(this.x, this.y + this.length, this.z);
+        const pRight = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
+        const pFront = RD.screenCoords(this.x + this.width, this.y, this.z);
+        const pLeft  = RD.screenCoords(this.x, this.y, this.z);
 
-        const pBack   = RD.screenCoords(this.x, this.y + this.length + 0.03, this.z);
-        const pRight  = RD.screenCoords(this.x + this.width, this.y + this.length + 0.03, this.z);
-        const pFront  = RD.screenCoords(this.x + this.width, this.y - 0.03, this.z);
-        const pLeft   = RD.screenCoords(this.x, this.y - 0.03, this.z);
+        
+        const dropZ = -8;
+        const pFrontDrop = RD.screenCoords(this.x + this.width, this.y, this.z + dropZ);
+        const pLeftDrop  = RD.screenCoords(this.x, this.y, this.z + dropZ);
 
-        ctx.fillStyle = this.topColor;
+        ctx.fillStyle = '#221c38'; 
+        ctx.beginPath();
+        ctx.moveTo(pLeft.x, pLeft.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pFrontDrop.x, pFrontDrop.y);
+        ctx.lineTo(pLeftDrop.x, pLeftDrop.y);
+        ctx.closePath();
+        ctx.fill();
+
+        
+        ctx.fillStyle = '#4e4868';
         ctx.beginPath();
         ctx.moveTo(pBack.x, pBack.y);
         ctx.lineTo(pRight.x, pRight.y);
@@ -108,44 +168,38 @@ class RoadSegment {
         ctx.closePath();
         ctx.fill();
 
-        const separatorBack = RD.screenCoords(
-            this.x + this.width / 2,
-            this.y + this.length + 0.03,
-            this.z + 0.01
-        );
-        const separatorFront = RD.screenCoords(
-            this.x + this.width / 2,
-            this.y - 0.03,
-            this.z + 0.01
-        );
-
-        ctx.strokeStyle = '#efecb0';
-        ctx.lineWidth = 5;
-        ctx.setLineDash([18, 32]);
+       
+        ctx.strokeStyle = '#8278a8';
+        ctx.lineWidth = 6;
         ctx.beginPath();
-        ctx.moveTo(separatorBack.x, separatorBack.y);
-        ctx.lineTo(separatorFront.x, separatorFront.y);
+        ctx.moveTo(pLeft.x, pLeft.y);
+        ctx.lineTo(pBack.x, pBack.y);
         ctx.stroke();
-        ctx.setLineDash([0,0]);
 
+        
+        ctx.strokeStyle = '#322c4c';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(pFront.x, pFront.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.stroke();
     }
 }
 
-class Bullet{
-    constructor(x, y, z){
+class Bullet {
+    constructor(x, y, z) {
         this.x = x;
-        this.y=y;
-        this.z=z;
-        this.speed=0.6;
-        this.length=1.0;
+        this.y = y;
+        this.z = z;
+        this.speed = 0.6;
+        this.length = 1.0;
     }
 
-    update(){
+    update() {
         this.y = this.y + this.speed;
-
     }
 
-    draw(ctx){
+    draw(ctx) {
         const start = RD.screenCoords(this.x, this.y, this.z);
         const tip = RD.screenCoords(this.x, this.y + this.length, this.z);
 
@@ -159,17 +213,16 @@ class Bullet{
 }
 
 class Vehicle {
-    constructor(type, x, y) {
-        this.type = type
+    constructor(type, x = 8, y = 5) {
+        this.type = type;
         this.x = x;
         this.y = y;
         this.z = 5; 
         this.speed = 0.1;
         this.width = 1;
         this.length = 1.5;
-        this.height = 1;
 
-        this.groundZ= 20;
+        this.groundZ= 5;
         this.vz= 0;
         this.isJumping = false;
 
@@ -191,9 +244,9 @@ class Vehicle {
             if(IM.isDown('KeyS') || IM.isDown('ArrowDown')) {
                 this.y -= this.speed;
             }
-            if(IM.isJustPressed('Space')){
+            if(IM.isDown('Space') && !this.isJumping){
                 this.isJumping = true;
-                this.vz=4;
+                this.vz=2.5;
             }
 
             if(this.isJumping){
@@ -213,7 +266,7 @@ class Vehicle {
 
             }
 
-            if(IM.isDown('KeyE') && this.shootCoolDown === 0){
+            if(IM.isDown('KeyZ') && this.shootCoolDown === 0){
                 const bullet = new Bullet(
                     this.x + this.width /2,
                     this.y + this.length,
@@ -258,7 +311,7 @@ class Vehicle {
        ctx.drawImage(
         bikeSprite,
         center.x - spriteWidth/2,
-        center.y - spriteHeight/2,
+        center.y - 25,
         spriteWidth,
         spriteHeight
        );
@@ -273,86 +326,31 @@ class Vehicle {
     }
 }
 
-class Obstacle {
-    constructor(x, y, z, width = 1, length = 1) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.width = width;
-        this.length = length;
-        this.height = 1;
-        this.type = 'obstacle';
 
 
-    }
+//Entities
 
-    draw(ctx) {
-        let pBack = RD.screenCoords(this.x, this.y + this.length, this.z);
-        let pRight = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
-        let pFront = RD.screenCoords(this.x + this.width, this.y, this.z);
-        let pLeft = RD.screenCoords(this.x, this.y, this.z);
+EM.entities.push(new RoadSegment(5, 0));
+EM.entities.push(new RoadSegment(5, 10));
 
-        ctx.fillStyle = '#8B0000';
-        ctx.beginPath();
-        ctx.moveTo(pBack.x, pBack.y);
-        ctx.lineTo(pRight.x, pRight.y);
-        ctx.lineTo(pFront.x, pFront.y);
-        ctx.lineTo(pLeft.x, pLeft.y);
-        ctx.closePath();
-        ctx.fill();
-    }
-}
-
-let roadSegmentCount = 0;
-let nextJumpAt = 12 + Math.floor(Math.random() * 4);
-let highestY = 0;
-
-function getNextGap() {
-    roadSegmentCount++;
-    if (roadSegmentCount >= nextJumpAt) {
-        nextJumpAt = roadSegmentCount + 12 + Math.floor(Math.random() * 4);
-        return 7.0; 
-    }
-    return 0;
-}
-
-// Initial Road segments
-const roadCount = 10;
-for (let i = 0; i < roadCount; i++) {
-    const gap = getNextGap();
-    EM.add(new RoadSegment(5, highestY, 7, 10));
-    highestY += 10 + gap;
-}
-
-// Segment updates
-function updateRoads(scrollSpeed = 0.1) {
-    highestY -= scrollSpeed;
-
-    for (const road of EM.roads) {
-        road.update(scrollSpeed);
-
-        if (road.y + road.length < -15) {
-            const gap = getNextGap();
-            road.y = highestY + gap;
-            highestY = road.y + road.length;
-        }
-    }
-}
-
-// Player entity
 const playerVehicle = new Vehicle('player', 6.5, 4);
 EM.entities.push(playerVehicle);
 
-//Obstacle entity
-const obstacle = new Obstacle(7, 10, 20);
-EM.entities.push(obstacle);
-
 // Game loop
 function gameLoop() {
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawStarField(ctx);
 
-    updateRoads();
+    const scrollSpeed = 0.08;
+    for(const entity of EM.entities){
+        if(entity instanceof RoadSegment){
+            entity.update(scrollSpeed);
+
+            if(entity.y + entity.length < 0){
+                entity.y += 20;
+            }
+        }
+    }
+
     playerVehicle.update();
     RD.render(EM.entities);
     IM.update();
