@@ -146,6 +146,96 @@ function createEnemySprite() {
 
 const enemySprite = createEnemySprite();
 
+function createDestroyedBikeSprite() {
+    const sCanvas = document.createElement('canvas');
+    sCanvas.width = 110;
+    sCanvas.height = 80;
+    const sCtx = sCanvas.getContext('2d');
+
+    // Scorch shadow
+    sCtx.fillStyle = 'rgba(255, 60, 0, 0.4)';
+    sCtx.beginPath();
+    sCtx.ellipse(55, 52, 40, 14, 0, 0, Math.PI * 2);
+    sCtx.fill();
+
+    // Outer explosion burst
+    sCtx.fillStyle = '#ff3d00';
+    sCtx.beginPath();
+    sCtx.arc(55, 42, 24, 0, Math.PI * 2);
+    sCtx.arc(40, 36, 17, 0, Math.PI * 2);
+    sCtx.arc(70, 38, 16, 0, Math.PI * 2);
+    sCtx.fill();
+
+    // Inner fiery core
+    sCtx.fillStyle = '#ffea00';
+    sCtx.beginPath();
+    sCtx.arc(55, 42, 15, 0, Math.PI * 2);
+    sCtx.arc(46, 38, 9, 0, Math.PI * 2);
+    sCtx.arc(64, 40, 9, 0, Math.PI * 2);
+    sCtx.fill();
+
+    // Hot white flash
+    sCtx.fillStyle = '#ffffff';
+    sCtx.beginPath();
+    sCtx.arc(55, 42, 7, 0, Math.PI * 2);
+    sCtx.fill();
+
+    // Debris fragments
+    sCtx.fillStyle = '#00f0ff';
+    sCtx.fillRect(26, 24, 6, 5);
+    sCtx.fillRect(78, 22, 6, 5);
+    sCtx.fillStyle = '#e61c38';
+    sCtx.fillRect(36, 52, 7, 4);
+    sCtx.fillRect(68, 54, 7, 4);
+
+    return sCanvas;
+}
+const destroyedBikeSprite = createDestroyedBikeSprite();
+
+function createDestroyedEnemySprite() {
+    const sCanvas = document.createElement('canvas');
+    sCanvas.width = 110;
+    sCanvas.height = 80;
+    const sCtx = sCanvas.getContext('2d');
+
+    // Scorch shadow
+    sCtx.fillStyle = 'rgba(0, 230, 118, 0.3)';
+    sCtx.beginPath();
+    sCtx.ellipse(55, 50, 40, 14, 0, 0, Math.PI * 2);
+    sCtx.fill();
+
+    // Outer plasma burst
+    sCtx.fillStyle = '#ff1744';
+    sCtx.beginPath();
+    sCtx.arc(55, 42, 24, 0, Math.PI * 2);
+    sCtx.arc(38, 38, 16, 0, Math.PI * 2);
+    sCtx.arc(72, 36, 16, 0, Math.PI * 2);
+    sCtx.fill();
+
+    // Inner green/neon blast
+    sCtx.fillStyle = '#00e676';
+    sCtx.beginPath();
+    sCtx.arc(55, 42, 14, 0, Math.PI * 2);
+    sCtx.arc(46, 40, 8, 0, Math.PI * 2);
+    sCtx.arc(64, 38, 8, 0, Math.PI * 2);
+    sCtx.fill();
+
+    // White core
+    sCtx.fillStyle = '#ffffff';
+    sCtx.beginPath();
+    sCtx.arc(55, 42, 6, 0, Math.PI * 2);
+    sCtx.fill();
+
+    // Debris
+    sCtx.fillStyle = '#ffff00';
+    sCtx.fillRect(30, 28, 5, 5);
+    sCtx.fillRect(75, 26, 6, 5);
+    sCtx.fillStyle = '#4a148c';
+    sCtx.fillRect(40, 56, 6, 4);
+
+    return sCanvas;
+}
+const destroyedEnemySprite = createDestroyedEnemySprite();
 
 const stars = [];
 const starCount = 60;
@@ -281,6 +371,7 @@ class Vehicle {
         this.speed = 0.12;
         this.width = 1;
         this.length = 1.5;
+        this.height = 1;
 
         this.groundZ= 5;
         this.vz= 0;
@@ -288,9 +379,32 @@ class Vehicle {
 
         this.bullets = [];
         this.shootCoolDown = 0;
+        //flags
+        this.isDestroyed = false;
+        this.isImmune = false;
+        this.isBoosted = false;
+
+        this.destroyFrames = 30; // duration in frames to show destroyed sprite
+        this.destroyTimer = 0;
+    }
+
+    destroy() {
+        if (this.isDestroyed) return;
+        this.isDestroyed = true;
+        this.destroyTimer = this.destroyFrames;
     }
 
     update() {
+        if (this.isDestroyed) {
+            if (this.destroyTimer === 0) this.destroyTimer = this.destroyFrames;
+            this.destroyTimer--;
+            if (this.destroyTimer <= 0) {
+                this.isDestroyed = false;
+                this.destroyTimer = 0;
+            }
+            return;
+        }
+
         if (this.type === 'player') {
             if (IM.isDown('KeyA') || IM.isDown('ArrowLeft')) {
                 this.x += this.speed;
@@ -326,7 +440,7 @@ class Vehicle {
 
             }
 
-            if(IM.isDown('KeyZ') && this.shootCoolDown === 0){
+            if((IM.isDown('KeyZ') || IM.isDown('KeyE')) && this.shootCoolDown === 0){
                 const bullet = new Bullet(
                     this.x + this.width /2,
                     this.y + this.length,
@@ -368,8 +482,10 @@ class Vehicle {
        const spriteWidth = 105;
        const spriteHeight = 78; 
 
+       const currentSprite = this.isDestroyed ? destroyedBikeSprite : bikeSprite;
+
        ctx.drawImage(
-        bikeSprite,
+        currentSprite,
         center.x - spriteWidth/2,
         center.y - 25,
         spriteWidth,
@@ -394,14 +510,36 @@ class Enemy {
         this.z = 5; 
         this.width = 1;
         this.length = 1.5;
+        this.height = 1;
         this.speed = 0.04;
+
+        this.isDestroyed = false;
+        this.destroyFrames = 30; // duration in frames to show destroyed sprite
+        this.destroyTimer = 0;
+    }
+
+    destroy() {
+        if (this.isDestroyed) return;
+        this.isDestroyed = true;
+        this.destroyTimer = this.destroyFrames;
     }
 
     update(scrollSpeed) {
-    
+        if (this.isDestroyed) {
+            if (this.destroyTimer === 0) this.destroyTimer = this.destroyFrames;
+            // Drift with the road while destroyed
+            this.y -= scrollSpeed;
+            this.destroyTimer--;
+            if (this.destroyTimer <= 0) {
+                this.isDestroyed = false;
+                this.destroyTimer = 0;
+                this.respawn();
+            }
+            return;
+        }
+
         this.y -= (this.speed + scrollSpeed);
 
-    
         if (this.y < -2) {
             this.respawn();
         }
@@ -412,7 +550,7 @@ class Enemy {
         this.x = 6.0 + Math.random() * 4.5; 
     }
 
-           draw(ctx) {
+    draw(ctx) {
         const center = RD.screenCoords(
             this.x + this.width / 2,
             this.y + this.length / 2,
@@ -422,8 +560,10 @@ class Enemy {
         const spriteWidth = 105;
         const spriteHeight = 78;
 
+        const currentSprite = this.isDestroyed ? destroyedEnemySprite : enemySprite;
+
         ctx.drawImage(
-            enemySprite,
+            currentSprite,
             center.x - spriteWidth / 2,
             center.y - 25,
             spriteWidth,
@@ -433,6 +573,9 @@ class Enemy {
 
 }
 
+class boosts {
+    
+}
 
 
 
@@ -448,11 +591,11 @@ const roadSegments = [
 ];
 
 for (const road of roadSegments) {
-    EM.entities.push(road);
+    EM.add(road);
 }
 
 const playerVehicle = new Vehicle('player', 6.5, 4);
-EM.entities.push(playerVehicle);
+EM.add(playerVehicle);
 
 
 const enemies = [
@@ -461,7 +604,7 @@ const enemies = [
 ];
 
 for (const enemy of enemies) {
-    EM.entities.push(enemy);
+    EM.add(enemy);
 }
 
 let score = 0;
@@ -489,11 +632,15 @@ function gameLoop() {
 
     playerVehicle.update();
 
+    const collisions = EM.getCollisions();
+
         // Bullet-to-Enemy Collision Check
     for (let bIndex = playerVehicle.bullets.length - 1; bIndex >= 0; bIndex--) {
         const bullet = playerVehicle.bullets[bIndex];
 
         for (const enemy of enemies) {
+            if (enemy.isDestroyed) continue;
+
             // AABB hit distance check in world coordinates
             const dx = Math.abs(bullet.x - (enemy.x + enemy.width / 2));
             const dy = Math.abs(bullet.y - (enemy.y + enemy.length / 2));
@@ -502,8 +649,8 @@ function gameLoop() {
                 // HIT! Remove the bullet
                 playerVehicle.bullets.splice(bIndex, 1);
 
-                // Respawn the destroyed enemy back at the horizon
-                enemy.respawn();
+                // Destroy the enemy (plays destruction animation for specified frames before respawning)
+                enemy.destroy();
 
                 // Award points
                 score += 100;
@@ -512,6 +659,13 @@ function gameLoop() {
         }
     }
 
+    // Enemy to player collision check
+    for (const enemy of collisions.playerWithEnemy){
+        if (!enemy.isDestroyed && !playerVehicle.isDestroyed) {
+            enemy.destroy();
+            playerVehicle.destroy();
+        }
+    }
 
 
     RD.render(EM.entities);

@@ -129,13 +129,15 @@ export class EntityManager {
     }   
 
     areColliding(entityA, entityB) {
+        if (!entityA || !entityB) return false;
+
         const ax1 = entityA.x; const ax2 = entityA.x + entityA.width;
         const ay1 = entityA.y; const ay2 = entityA.y + entityA.length;
-        const az1 = entityA.z; const az2 = entityA.z + entityA.height;
+        const az1 = entityA.z; const az2 = entityA.z + (entityA.height ?? 1);
 
         const bx1 = entityB.x; const bx2 = entityB.x + entityB.width;
         const by1 = entityB.y; const by2 = entityB.y + entityB.length;
-        const bz1 = entityB.z; const bz2 = entityB.z + entityB.height;
+        const bz1 = entityB.z; const bz2 = entityB.z + (entityB.height ?? 1);
 
         if (ax1 < bx2 && ax2 > bx1 &&
             ay1 < by2 && ay2 > by1 &&
@@ -148,7 +150,7 @@ export class EntityManager {
     getCollisions() {
 
         const collisions = {
-            playerWithEnemy: null,
+            playerWithEnemy: [],
             playerWithBullets: [],
             playerWithBoosts: [],
             playerWithObstacles: [],
@@ -156,11 +158,12 @@ export class EntityManager {
         };
 
         //Player collisions
-
-        for (let i = 0; i < this.enemies.length; i++) {
-            const enemy = this.enemies[i];
-            if (this.areColliding(this.player, enemy)) {
-                collisions.playerWithEnemy = enemy;
+        if (this.player) {
+            for (let i = 0; i < this.enemies.length; i++) {
+                const enemy = this.enemies[i];
+                if (this.areColliding(this.player, enemy)) {
+                    collisions.playerWithEnemy.push(enemy);
+                }
             }
         }
 
