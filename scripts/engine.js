@@ -87,6 +87,7 @@ export class EntityManager {
                 this.roads.push(entity);
                 break;
             case 'boost':
+            case 'pad':
                 this.boosts.push(entity);
                 break;
             case 'obstacle':
@@ -165,26 +166,26 @@ export class EntityManager {
                     collisions.playerWithEnemy.push(enemy);
                 }
             }
-        }
 
-        for (let i = 0; i < this.bullets.length; i++) {
-            const bullet = this.bullets[i];
-            if (this.areColliding(bullet, this.player)) {
-                collisions.playerWithBullets.push(bullet);
+            for (let i = 0; i < this.bullets.length; i++) {
+                const bullet = this.bullets[i];
+                if (this.areColliding(bullet, this.player)) {
+                    collisions.playerWithBullets.push(bullet);
+                }
             }
-        }
 
-        for (let i = 0; i < this.boosts.length; i++) {
-            const boost = this.boosts[i];
-            if (this.areColliding(boost, this.player)) {
-                collisions.playerWithBoosts.push(boost);
+            for (let i = 0; i < this.boosts.length; i++) {
+                const boost = this.boosts[i];
+                if (this.areColliding(boost, this.player)) {
+                    collisions.playerWithBoosts.push(boost);
+                }
             }
-        }
 
-        for (let i = 0; i < this.obstacles.length; i++) {
-            const obstacle = this.obstacles[i];
-            if (this.areColliding(obstacle, this.player)) {
-                collisions.playerWithObstacles.push(obstacle);
+            for (let i = 0; i < this.obstacles.length; i++) {
+                const obstacle = this.obstacles[i];
+                if (this.areColliding(obstacle, this.player)) {
+                    collisions.playerWithObstacles.push(obstacle);
+                }
             }
         }
 

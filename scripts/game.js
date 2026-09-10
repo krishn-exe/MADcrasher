@@ -368,6 +368,7 @@ class Vehicle {
         this.x = x;
         this.y = y;
         this.z = 5; 
+        this.baseSpeed = 0.12;
         this.speed = 0.12;
         this.width = 1;
         this.length = 1.5;
@@ -379,13 +380,14 @@ class Vehicle {
 
         this.bullets = [];
         this.shootCoolDown = 0;
-        //flags
-        this.isDestroyed = false;
-        this.isImmune = false;
-        this.isBoosted = false;
 
+        // Flags & Frame Counters
+        this.isDestroyed = false;
         this.destroyFrames = 30; // duration in frames to show destroyed sprite
         this.destroyTimer = 0;
+
+        // Boost Pad: active only while colliding
+        this.isOnBoostPad = false;
     }
 
     destroy() {
@@ -401,8 +403,22 @@ class Vehicle {
             if (this.destroyTimer <= 0) {
                 this.isDestroyed = false;
                 this.destroyTimer = 0;
+                // Reset player position and boosts after destruction
+                this.x = 6.5;
+                this.y = 4;
+                this.z = this.groundZ;
+                this.vz = 0;
+                this.isJumping = false;
+                this.isOnBoostPad = false;
             }
             return;
+        }
+
+        // Boost pad gives a massive speed increase only while colliding
+        if (this.isOnBoostPad) {
+            this.speed = this.baseSpeed * 2.5;
+        } else {
+            this.speed = this.baseSpeed;
         }
 
         if (this.type === 'player') {
@@ -482,6 +498,19 @@ class Vehicle {
        const spriteWidth = 105;
        const spriteHeight = 78; 
 
+       // Boost thruster flames behind the bike when on boost pad
+       if (this.isOnBoostPad) {
+           ctx.save();
+           const flameLen = 34;
+           ctx.strokeStyle = '#ff6600';
+           ctx.lineWidth = 4;
+           ctx.beginPath();
+           ctx.moveTo(center.x + 22, center.y + 10);
+           ctx.lineTo(center.x + 22 + flameLen, center.y + 10 - flameLen * 0.45);
+           ctx.stroke();
+           ctx.restore();
+       }
+
        const currentSprite = this.isDestroyed ? destroyedBikeSprite : bikeSprite;
 
        ctx.drawImage(
@@ -492,7 +521,6 @@ class Vehicle {
         spriteHeight
        );
 
-       
         for (const b of this.bullets) {
             b.draw(ctx);
         }
@@ -573,11 +601,84 @@ class Enemy {
 
 }
 
-class boosts {
-    
-}
+class BoostPad {
+    constructor(x, y, length = 10.0, width = 2.2) {
+        this.type = 'boost';
+        this.subType = 'pad';
+        this.x = x;
+        this.y = y;
+        this.z = 0.05; // Placed on the road surface
+        this.length = length;
+        this.width = width;
+        this.height = 6.0; // High enough to intersect grounded vehicle at z=5
 
+        this.animTimer = Math.random() * Math.PI * 2;
+    }
 
+    update(scrollSpeed) {
+        this.animTimer += 0.05;
+        this.y -= scrollSpeed;
+
+        if (this.y + this.length < -5) {
+            this.respawn();
+        }
+    }
+
+    respawn() {
+        this.y = 35 + Math.random() * 20;
+        this.x = 6.5 + Math.random() * 2.0; // Stays centered on the road (minX=5, maxX=12)
+    }
+
+    draw(ctx) {
+        const pBack   = RD.screenCoords(this.x, this.y + this.length, this.z);
+        const pRight  = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
+        const pFront  = RD.screenCoords(this.x + this.width, this.y, this.z);
+        const pLeft   = RD.screenCoords(this.x, this.y, this.z);
+
+        ctx.fillStyle = 'rgba(255, 120, 0, 0.45)';
+        ctx.beginPath();
+        ctx.moveTo(pBack.x, pBack.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pLeft.x, pLeft.y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Static direction arrows on the pad surface.
+        const arrowLength = 1.2;
+        const arrowWidth = 0.7;
+        const arrowPositions = [
+            this.y + this.length * 0.3,
+            this.y + this.length * 0.7
+        ];
+
+        ctx.fillStyle = '#ffe600';
+        for (const arrowY of arrowPositions) {
+            const arrowPoints = [
+                RD.screenCoords(this.x + this.width / 2, arrowY + arrowLength / 2, this.z + 0.02),
+                RD.screenCoords(this.x + this.width / 2 + arrowWidth / 2, arrowY - arrowLength / 2, this.z + 0.02),
+                RD.screenCoords(this.x + this.width / 2, arrowY - arrowLength * 0.1, this.z + 0.02),
+                RD.screenCoords(this.x + this.width / 2 - arrowWidth / 2, arrowY - arrowLength / 2, this.z + 0.02)
+            ];
+
+            ctx.beginPath();
+            ctx.moveTo(arrowPoints[0].x, arrowPoints[0].y);
+            for (const point of arrowPoints.slice(1)) {
+                ctx.lineTo(point.x, point.y);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Neon border
+        ctx.strokeStyle = '#ff9900';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        }
+    }
+
+const Boost = BoostPad;
+const boosts = BoostPad;
 
 //Entities
 
@@ -607,6 +708,16 @@ for (const enemy of enemies) {
     EM.add(enemy);
 }
 
+// Boost pads on the road
+const boostPads = [
+    new BoostPad(6.0, 14, 10.0, 3.0),
+    new BoostPad(6.8, 38, 10.0, 3.0)
+];
+
+for (const pad of boostPads) {
+    EM.add(pad);
+}
+
 let score = 0;
 
 
@@ -614,27 +725,33 @@ let score = 0;
 function gameLoop() {
     drawStarField(ctx);
 
-    const scrollSpeed = 0.08;
-    for (const entity of EM.entities) {
-    if (entity instanceof RoadSegment) {
-        entity.update(scrollSpeed);
+    // Dynamic scroll speed: faster when on boost pad
+    const baseScrollSpeed = 0.08;
+    const scrollSpeed = playerVehicle.isOnBoostPad ? baseScrollSpeed * 2.2 : baseScrollSpeed;
 
-        if (entity.y + entity.length < 0) {
-            entity.y += 44;
+    for (const entity of EM.entities) {
+        if (entity instanceof RoadSegment) {
+            entity.update(scrollSpeed);
+
+            if (entity.y + entity.length < 0) {
+                entity.y += 44;
+            }
         }
     }
-}
 
-        for (const enemy of enemies) {
+    for (const enemy of enemies) {
         enemy.update(scrollSpeed);
     }
 
+    for (const pad of boostPads) {
+        pad.update(scrollSpeed);
+    }
 
     playerVehicle.update();
 
     const collisions = EM.getCollisions();
 
-        // Bullet-to-Enemy Collision Check
+    // Bullet-to-Enemy Collision Check
     for (let bIndex = playerVehicle.bullets.length - 1; bIndex >= 0; bIndex--) {
         const bullet = playerVehicle.bullets[bIndex];
 
@@ -667,15 +784,16 @@ function gameLoop() {
         }
     }
 
+    // Player and boost pad collision check: active only while colliding
+    playerVehicle.isOnBoostPad = collisions.playerWithBoosts.length > 0;
 
     RD.render(EM.entities);
     IM.update();
 
-        // Draw Retro Arcade Score HUD
+    // Draw Retro Arcade Score HUD
     ctx.fillStyle = '#ffff00';
     ctx.font = 'bold 22px "Courier New", monospace';
     ctx.fillText(`SCORE: ${score}`, 30, 45);
-
 
     requestAnimationFrame(gameLoop);
 }
