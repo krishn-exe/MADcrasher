@@ -454,6 +454,8 @@ for (const enemy of enemies) {
     EM.entities.push(enemy);
 }
 
+let score = 0;
+
 
 // Game loop
 function gameLoop() {
@@ -476,8 +478,41 @@ function gameLoop() {
 
 
     playerVehicle.update();
+
+        // Bullet-to-Enemy Collision Check
+    for (let bIndex = playerVehicle.bullets.length - 1; bIndex >= 0; bIndex--) {
+        const bullet = playerVehicle.bullets[bIndex];
+
+        for (const enemy of enemies) {
+            // AABB hit distance check in world coordinates
+            const dx = Math.abs(bullet.x - (enemy.x + enemy.width / 2));
+            const dy = Math.abs(bullet.y - (enemy.y + enemy.length / 2));
+
+            if (dx < 1.0 && dy < 1.2) {
+                // HIT! Remove the bullet
+                playerVehicle.bullets.splice(bIndex, 1);
+
+                // Respawn the destroyed enemy back at the horizon
+                enemy.respawn();
+
+                // Award points
+                score += 100;
+                break;
+            }
+        }
+    }
+
+
+
     RD.render(EM.entities);
     IM.update();
+
+        // Draw Retro Arcade Score HUD
+    ctx.fillStyle = '#ffff00';
+    ctx.font = 'bold 22px "Courier New", monospace';
+    ctx.fillText(`SCORE: ${score}`, 30, 45);
+
+
     requestAnimationFrame(gameLoop);
 }
 
