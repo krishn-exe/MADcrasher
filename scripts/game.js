@@ -575,8 +575,19 @@ class Obstacle {
     }
 
     respawn() {
-        this.y = 35 + Math.random() * 25; 
-        this.x = 6.0 + Math.random() * 3.5; 
+        const aheadRoads = roadSegments.filter(r => r.y > 20);
+
+        if (aheadRoads.length > 0) {
+            
+            const road = aheadRoads[Math.floor(Math.random() * aheadRoads.length)];
+            
+            this.y = road.y + 1.0 + Math.random() * Math.max(0.5, road.length - this.length - 2.0);
+            
+            this.x = road.x + 0.8 + Math.random() * Math.max(0.5, road.width - this.width - 1.6);
+        }else{
+            this.y = 40;
+            this.x = 7.0;
+        } 
     }
 
     draw(ctx) {
@@ -639,7 +650,7 @@ class Obstacle {
 }
 
 class BoostPad {
-    constructor(x, y, length = 10.0, width = 2.2) {
+    constructor(x, y, length = 3.5, width = 2.2) {
         this.type = 'boost';
         this.subType = 'pad';
         this.x = x;
@@ -661,9 +672,17 @@ class BoostPad {
         }
     }
 
-    respawn() {
-        this.y = 35 + Math.random() * 20;
-        this.x = 6.5 + Math.random() * 2.0;
+    respawn(){
+        const aheadRoads =roadSegments.filter(r => r.y > 20);
+        if (aheadRoads.length > 0) {
+
+            const road = aheadRoads[Math.floor(Math.random() * aheadRoads.length)];
+            this.y = road.y + 0.5 + Math.random() * Math.max(0.5, road.length - this.length - 1.0);
+            this.x = road.x + 0.5 + Math.random() * Math.max(0.5, road.width - this.width - 1.0);
+        }else{
+            this.y = 35;
+            this.x = 6.8;
+        }
     }
 
     draw(ctx) {
@@ -753,8 +772,8 @@ for (const enemy of enemies) {
 }
 
 const boostPads = [
-    new BoostPad(6.0, 14, 10.0, 3.0),
-    new BoostPad(6.8, 38, 10.0, 3.0)
+    new BoostPad(6.0, 26, 3.5, 2.5),
+    new BoostPad(6.8, 37, 3.5, 2.5)
 ];
 
 for (const pad of boostPads) {
@@ -762,8 +781,8 @@ for (const pad of boostPads) {
 }
 
 const obstacle = [
-    new Obstacle(6.8, 18),
-    new Obstacle(8.5, 32)
+    new Obstacle(6.8, 29),
+    new Obstacle(8.5, 40)
 ]
 
 for(const obs of obstacle){
@@ -835,7 +854,7 @@ function gameLoop() {
             entity.update(scrollSpeed);
 
             if (entity.y + entity.length < 0) {
-                entity.y += 44;
+                entity.y += 48;
             }
         }
     }
