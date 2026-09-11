@@ -20,6 +20,7 @@ const EM = new EntityManager();
 const urlParams = new URLSearchParams(window.location.search);
 const playerName = urlParams.get('player-name') || localStorage.getItem('currentPlayer') || 'Player';
 localStorage.setItem('currentPlayer', playerName);
+const mapName = urlParams.get('background') || 'background-1';
 
 
 function createBikeSprite() {
@@ -230,7 +231,7 @@ function createDestroyedEnemySprite() {
 const destroyedEnemySprite = createDestroyedEnemySprite();
 
 class ParallaxBackground {
-    constructor(imageSrc = 'assets/background.png') {
+    constructor(imageSrc = 'assets/background-2.png') {
         this.type = 'background';
         this.z = -999999;
         this.x = 0;
@@ -280,7 +281,7 @@ class ParallaxBackground {
         }
 
         const aspect = this.image.naturalWidth / this.image.naturalHeight;
-        const tileHeight = Math.max(canvas.height, 600);
+        const tileHeight = canvas.height*1.5;
         const tileWidth = tileHeight * aspect;
 
         const startX = (((this.scrollX + this.steerOffset) % tileWidth) + tileWidth) % tileWidth - tileWidth;
@@ -696,7 +697,7 @@ class BoostPad {
 const Boost = BoostPad;
 const boosts = BoostPad;
 
-const parallaxBg = new ParallaxBackground('assets/background.png');
+const parallaxBg = new ParallaxBackground(`assets/${mapName}.png`);
 EM.add(parallaxBg);
 
 const roadSegments = [
