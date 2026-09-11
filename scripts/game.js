@@ -503,15 +503,6 @@ class Vehicle {
                 }
             }
 
-            const minX = 5.2;
-            const maxX = 11.2;
-            if(this.x < minX) this.x = minX;
-            if(this.x > maxX) this.x = maxX
-
-            const minY = 0.8;
-            const maxY = 18.0;
-            if(this.y < minY) this.y = minY;
-            if(this.y > maxY) this.y = maxY;
         }
     }
 
