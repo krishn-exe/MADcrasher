@@ -24,6 +24,13 @@ playerSpriteImg.onload = () => {
     isplayerSpriteLoaded = true;
 };
 
+const enemySpriteImg = new Image();
+enemySpriteImg.src = 'assets/enemy.png';
+let isEnemySpriteLoaded = false;
+enemySpriteImg.onload = () => {
+    isEnemySpriteLoaded = true;
+}
+
 const urlParams = new URLSearchParams(window.location.search);
 const playerName = urlParams.get('player-name') || localStorage.getItem('currentPlayer') || 'Player';
 localStorage.setItem('currentPlayer', playerName);
@@ -652,15 +659,39 @@ class Enemy {
         const spriteWidth = 105;
         const spriteHeight = 78;
 
-        const currentSprite = this.isDestroyed ? destroyedEnemySprite : enemySprite;
+       if(this.isDestroyed){
+        ctx.drawImage(
+            destroyedEnemySprite,
+            center.x -spriteWidth/2,
+            center.y - 25,
+            spriteWidth,
+            spriteHeight
+        )
+       }else if(isEnemySpriteLoaded){
+        const sx = 672;
+        const sy = 176;
+        const sWidth = 1496;
+        const sHeight = 1224;
+        const renderWidth = 115;
+        const renderHeight = 94;
 
         ctx.drawImage(
-            currentSprite,
-            center.x - spriteWidth / 2,
+            enemySpriteImg,
+            sx, sy,
+            sWidth, sHeight,
+            center.x - renderWidth/2, center.y - 45,
+            renderWidth, renderHeight
+
+        );
+     }else{
+        ctx.drawImage(
+            enemySprite,
+            center.x - spriteWidth/2,
             center.y - 25,
             spriteWidth,
             spriteHeight
         );
+     }
     }
 
 }
