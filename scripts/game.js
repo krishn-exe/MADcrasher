@@ -555,8 +555,102 @@ class Enemy {
 
 }
 
+class Obstacle {
+    constructor(x, y, width = 1.4, length = 0.8, height = 15) {
+        this.type = 'obstacle';
+        this.x = x;
+        this.y = y;
+        this.z = 0.1;
+        this.width = width;
+        this.length = length;
+        this.height = height; 
+    }
+
+    update(scrollSpeed) {
+        this.y = this.y - scrollSpeed;
+
+        if (this.y + this.length < -5) {
+            this.respawn();
+        }
+    }
+
+    respawn() {
+        const aheadRoads = roadSegments.filter(r => r.y > 20);
+
+        if (aheadRoads.length > 0) {
+            
+            const road = aheadRoads[Math.floor(Math.random() * aheadRoads.length)];
+            
+            this.y = road.y + 1.0 + Math.random() * Math.max(0.5, road.length - this.length - 2.0);
+            
+            this.x = road.x + 0.8 + Math.random() * Math.max(0.5, road.width - this.width - 1.6);
+        }else{
+            this.y = 40;
+            this.x = 7.0;
+        } 
+    }
+
+    draw(ctx) {
+        const topZ = this.z + this.height;
+
+       
+        const pBack  = RD.screenCoords(this.x, this.y + this.length, topZ);
+        const pRight = RD.screenCoords(this.x + this.width, this.y + this.length, topZ);
+        const pFront = RD.screenCoords(this.x + this.width, this.y, topZ);
+        const pLeft  = RD.screenCoords(this.x, this.y, topZ);
+
+       
+        const pFrontBase = RD.screenCoords(this.x + this.width, this.y, this.z);
+        const pLeftBase  = RD.screenCoords(this.x, this.y, this.z);
+        const pRightBase = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
+
+        
+        ctx.fillStyle = '#b71c1c'; 
+        ctx.beginPath();
+        ctx.moveTo(pLeft.x, pLeft.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pFrontBase.x, pFrontBase.y);
+        ctx.lineTo(pLeftBase.x, pLeftBase.y);
+        ctx.closePath();
+        ctx.fill();
+
+        
+        ctx.fillStyle = '#8b0000';
+        ctx.beginPath();
+        ctx.moveTo(pFront.x, pFront.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.lineTo(pRightBase.x, pRightBase.y);
+        ctx.lineTo(pFrontBase.x, pFrontBase.y);
+        ctx.closePath();
+        ctx.fill();
+
+       
+        ctx.fillStyle = '#ffd600'; 
+        ctx.beginPath();
+        ctx.moveTo(pBack.x, pBack.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pLeft.x, pLeft.y);
+        ctx.closePath();
+        ctx.fill();
+
+        
+        ctx.strokeStyle = '#ff6d00';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo((pLeft.x + pBack.x) / 2, (pLeft.y + pBack.y) / 2);
+        ctx.lineTo((pFront.x + pRight.x) / 2, (pFront.y + pRight.y) / 2);
+        ctx.stroke();
+    }
+}
+
 class BoostPad {
-    constructor(x, y, length = 10.0, width = 2.2) {
+    constructor(x, y, length = 3.5, width = 2.2) {
         this.type = 'boost';
         this.subType = 'pad';
         this.x = x;
@@ -578,9 +672,17 @@ class BoostPad {
         }
     }
 
-    respawn() {
-        this.y = 35 + Math.random() * 20;
-        this.x = 6.5 + Math.random() * 2.0;
+    respawn(){
+        const aheadRoads =roadSegments.filter(r => r.y > 20);
+        if (aheadRoads.length > 0) {
+
+            const road = aheadRoads[Math.floor(Math.random() * aheadRoads.length)];
+            this.y = road.y + 0.5 + Math.random() * Math.max(0.5, road.length - this.length - 1.0);
+            this.x = road.x + 0.5 + Math.random() * Math.max(0.5, road.width - this.width - 1.0);
+        }else{
+            this.y = 35;
+            this.x = 6.8;
+        }
     }
 
     draw(ctx) {
@@ -670,12 +772,21 @@ for (const enemy of enemies) {
 }
 
 const boostPads = [
-    new BoostPad(6.0, 14, 10.0, 3.0),
-    new BoostPad(6.8, 38, 10.0, 3.0)
+    new BoostPad(6.0, 26, 3.5, 2.5),
+    new BoostPad(6.8, 37, 3.5, 2.5)
 ];
 
 for (const pad of boostPads) {
     EM.add(pad);
+}
+
+const obstacle = [
+    new Obstacle(6.8, 29),
+    new Obstacle(8.5, 40)
+]
+
+for(const obs of obstacle){
+    EM.add(obs);
 }
 
 let score = 0;
@@ -743,7 +854,7 @@ function gameLoop() {
             entity.update(scrollSpeed);
 
             if (entity.y + entity.length < 0) {
-                entity.y += 44;
+                entity.y += 48;
             }
         }
     }
@@ -754,6 +865,10 @@ function gameLoop() {
 
     for (const pad of boostPads) {
         pad.update(scrollSpeed);
+    }
+
+    for(const obs of obstacle){
+        obs.update(scrollSpeed);
     }
 
     playerVehicle.update();
@@ -806,6 +921,29 @@ function gameLoop() {
     }
 
     playerVehicle.isOnBoostPad = collisions.playerWithBoosts.length > 0;
+
+     if (!playerVehicle.isDestroyed) {
+        const px = playerVehicle.x + playerVehicle.width / 2;
+        const py = playerVehicle.y + playerVehicle.length / 2;
+        for (const obs of obstacle){
+            const ox = obs.x + obs.width / 2;
+            const oy = obs.y + obs.length / 2;
+            const dx = Math.abs(px - ox);
+            const dy = Math.abs(py - oy);
+            
+            if (dx < 0.85 && dy < 1.0){
+                const barricadeTopZ = obs.z+obs.height;
+                
+                if (playerVehicle.z > barricadeTopZ) {
+                    
+                }else{
+                    playerVehicle.destroy();
+                    obs.respawn();
+                    break;
+                }
+            }
+        }
+    }
 
     RD.render(EM.entities);
     IM.update();
