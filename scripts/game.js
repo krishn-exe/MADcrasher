@@ -36,133 +36,6 @@ const playerName = urlParams.get('player-name') || localStorage.getItem('current
 localStorage.setItem('currentPlayer', playerName);
 const mapName = urlParams.get('background') || 'background-1';
 
-
-function createBikeSprite() {
-    const sCanvas = document.createElement('canvas');
-    sCanvas.width = 110;
-    sCanvas.height = 80;
-    const sCtx = sCanvas.getContext('2d');
-
-    
-    sCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    sCtx.beginPath();
-    sCtx.ellipse(55, 52, 38, 12, -Math.PI / 6, 0, Math.PI * 2);
-    sCtx.fill();
-
-    sCtx.fillStyle = '#101015'; 
-   
-    sCtx.beginPath();
-    sCtx.ellipse(32, 54, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
-    sCtx.fill();
-    
-    sCtx.beginPath();
-    sCtx.ellipse(78, 30, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
-    sCtx.fill();
-
-    
-    sCtx.fillStyle = '#00f0ff';
-    sCtx.beginPath();
-    sCtx.arc(32, 54, 4, 0, Math.PI * 2);
-    sCtx.arc(78, 30, 4, 0, Math.PI * 2);
-    sCtx.fill();
-
-    
-    sCtx.fillStyle = '#e61c38'; 
-    sCtx.beginPath();
-    sCtx.moveTo(96, 20); 
-    sCtx.lineTo(65, 42);
-    sCtx.lineTo(24, 52); 
-    sCtx.lineTo(34, 58); 
-    sCtx.lineTo(76, 36); 
-    sCtx.closePath();
-    sCtx.fill();
-
-    
-    sCtx.fillStyle = '#3a3ab5';
-    sCtx.beginPath();
-    sCtx.moveTo(48, 26);
-    sCtx.lineTo(82, 26);
-    sCtx.lineTo(60, 42);
-    sCtx.lineTo(32, 42);
-    sCtx.closePath();
-    sCtx.fill();
-
-    
-    sCtx.fillStyle = '#00f0ff';
-    sCtx.beginPath();
-    sCtx.ellipse(68, 25, 12, 6, -Math.PI / 8, 0, Math.PI * 2);
-    sCtx.fill();
-
-    
-    sCtx.fillStyle = '#ffaa00';
-    sCtx.fillRect(18, 48, 8, 5);
-
-    return sCanvas;
-}
-
-
-
-const bikeSprite = createBikeSprite();
-
-function createEnemySprite() {
-    const sCanvas = document.createElement('canvas');
-    sCanvas.width = 110;
-    sCanvas.height = 80;
-    const sCtx = sCanvas.getContext('2d');
-
-    
-    sCtx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-    sCtx.beginPath();
-    sCtx.ellipse(55, 48, 42, 12, -Math.PI / 6, 0, Math.PI * 2);
-    sCtx.fill();
-
-    
-    sCtx.fillStyle = '#101015';
-    sCtx.beginPath();
-    sCtx.ellipse(32, 54, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
-    sCtx.ellipse(78, 30, 15, 8, -Math.PI / 6, 0, Math.PI * 2);
-    sCtx.fill();
-
-    
-    sCtx.fillStyle = '#00e676';
-    sCtx.beginPath();
-    sCtx.moveTo(18, 56);
-    sCtx.lineTo(45, 38);
-    sCtx.lineTo(92, 18); 
-    sCtx.lineTo(82, 32);
-    sCtx.lineTo(35, 58);
-    sCtx.closePath();
-    sCtx.fill();
-
-   
-    sCtx.fillStyle = '#4a148c';
-    sCtx.beginPath();
-    sCtx.moveTo(35, 44);
-    sCtx.lineTo(75, 24);
-    sCtx.lineTo(65, 38);
-    sCtx.lineTo(30, 52);
-    sCtx.closePath();
-    sCtx.fill();
-
-    
-    sCtx.fillStyle = '#ff1744';
-    sCtx.beginPath();
-    sCtx.ellipse(45, 40, 12, 5, -Math.PI / 6, 0, Math.PI * 2);
-    sCtx.fill();
-
-   
-    sCtx.fillStyle = '#ffff00';
-    sCtx.beginPath();
-    sCtx.arc(20, 54, 3, 0, Math.PI * 2);
-    sCtx.arc(26, 58, 3, 0, Math.PI * 2);
-    sCtx.fill();
-
-    return sCanvas;
-}
-
-
-const enemySprite = createEnemySprite();
-
 function createDestroyedBikeSprite() {
     const sCanvas = document.createElement('canvas');
     sCanvas.width = 110;
@@ -584,14 +457,7 @@ class Vehicle {
             center.x - renderWidth /2, center.y - 50,
             renderWidth, renderHeight
         );
-       }else{
-        ctx.drawImage(
-            bikeSprite,
-            center.x - spriteWidth / 2,
-            center.y - 25,
-            spriteWidth,
-            spriteHeight
-        );
+       
        }
 
         for (const b of this.bullets) {
@@ -683,14 +549,6 @@ class Enemy {
             center.x - renderWidth/2, center.y - 45,
             renderWidth, renderHeight
 
-        );
-     }else{
-        ctx.drawImage(
-            enemySprite,
-            center.x - spriteWidth/2,
-            center.y - 25,
-            spriteWidth,
-            spriteHeight
         );
      }
     }
