@@ -17,6 +17,13 @@ const IM = new InputManager();
 const RD = new Renderer(ctx);
 const EM = new EntityManager();
 
+const playerSpriteImg = new Image();
+playerSpriteImg.src = 'assets/player-sprites.png';
+let isplayerSpriteLoaded = false;
+playerSpriteImg.onload = () => {
+    isplayerSpriteLoaded = true;
+};
+
 const urlParams = new URLSearchParams(window.location.search);
 const playerName = urlParams.get('player-name') || localStorage.getItem('currentPlayer') || 'Player';
 localStorage.setItem('currentPlayer', playerName);
@@ -401,6 +408,7 @@ class Vehicle {
         this.groundZ= 5;
         this.vz= 0;
         this.isJumping = false;
+        this.currentFrame = 2;
 
         this.bullets = [];
         this.shootCoolDown = 0;
@@ -457,9 +465,13 @@ class Vehicle {
         if (this.type === 'player') {
             if (IM.isDown('KeyA') || IM.isDown('ArrowLeft')) {
                 this.x += this.speed;
+                this.currentFrame = 0;
             }
             if (IM.isDown('KeyD') || IM.isDown('ArrowRight')) {
                 this.x -= this.speed;
+                this.currentFrame = 4;
+            }else{
+                this.currentFrame = 2;
             }
             if(IM.isDown('Space') && !this.isJumping){
                 this.isJumping = true;
@@ -530,15 +542,37 @@ class Vehicle {
             ctx.restore();
         }
 
-       const currentSprite = this.isDestroyed ? destroyedBikeSprite : bikeSprite;
+       if(this.isDestroyed){
+        ctx.drawImage(
+            destroyedBikeSprite,
+            center.x - spriteWidth /2,
+            center.y - 25,
+            spriteWidth,
+            spriteHeight
+        );
+       }else if(isplayerSpriteLoaded){
+        const frameWidth = 1030;
+        const frameHeight = 1045;
+        const sx = this.currentFrame * frameWidth;
+        const sy = 0;
+        const renderWidth = 105;
+        const renderHeight = 106;
 
-       ctx.drawImage(
-        currentSprite,
-        center.x - spriteWidth/2,
-        center.y - 25,
-        spriteWidth,
-        spriteHeight
-       );
+        ctx.drawImage(
+            playerSpriteImg,
+            sx, sy, frameWidth, frameHeight,
+            center.x - renderWidth /2, center.y - 50,
+            renderWidth, renderHeight
+        );
+       }else{
+        ctx.drawImage(
+            bikeSprite,
+            center.x - spriteWidth / 2,
+            center.y - 25,
+            spriteWidth,
+            spriteHeight
+        );
+       }
 
         for (const b of this.bullets) {
             b.draw(ctx);
