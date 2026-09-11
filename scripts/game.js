@@ -555,6 +555,89 @@ class Enemy {
 
 }
 
+class Obstacle {
+    constructor(x, y, width = 1.4, length = 0.8, height = 15) {
+        this.type = 'obstacle';
+        this.x = x;
+        this.y = y;
+        this.z = 0.1;
+        this.width = width;
+        this.length = length;
+        this.height = height; 
+    }
+
+    update(scrollSpeed) {
+        this.y = this.y - scrollSpeed;
+
+        if (this.y + this.length < -5) {
+            this.respawn();
+        }
+    }
+
+    respawn() {
+        this.y = 35 + Math.random() * 25; 
+        this.x = 6.0 + Math.random() * 3.5; 
+    }
+
+    draw(ctx) {
+        const topZ = this.z + this.height;
+
+       
+        const pBack  = RD.screenCoords(this.x, this.y + this.length, topZ);
+        const pRight = RD.screenCoords(this.x + this.width, this.y + this.length, topZ);
+        const pFront = RD.screenCoords(this.x + this.width, this.y, topZ);
+        const pLeft  = RD.screenCoords(this.x, this.y, topZ);
+
+       
+        const pFrontBase = RD.screenCoords(this.x + this.width, this.y, this.z);
+        const pLeftBase  = RD.screenCoords(this.x, this.y, this.z);
+        const pRightBase = RD.screenCoords(this.x + this.width, this.y + this.length, this.z);
+
+        
+        ctx.fillStyle = '#b71c1c'; 
+        ctx.beginPath();
+        ctx.moveTo(pLeft.x, pLeft.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pFrontBase.x, pFrontBase.y);
+        ctx.lineTo(pLeftBase.x, pLeftBase.y);
+        ctx.closePath();
+        ctx.fill();
+
+        
+        ctx.fillStyle = '#8b0000';
+        ctx.beginPath();
+        ctx.moveTo(pFront.x, pFront.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.lineTo(pRightBase.x, pRightBase.y);
+        ctx.lineTo(pFrontBase.x, pFrontBase.y);
+        ctx.closePath();
+        ctx.fill();
+
+       
+        ctx.fillStyle = '#ffd600'; 
+        ctx.beginPath();
+        ctx.moveTo(pBack.x, pBack.y);
+        ctx.lineTo(pRight.x, pRight.y);
+        ctx.lineTo(pFront.x, pFront.y);
+        ctx.lineTo(pLeft.x, pLeft.y);
+        ctx.closePath();
+        ctx.fill();
+
+        
+        ctx.strokeStyle = '#ff6d00';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo((pLeft.x + pBack.x) / 2, (pLeft.y + pBack.y) / 2);
+        ctx.lineTo((pFront.x + pRight.x) / 2, (pFront.y + pRight.y) / 2);
+        ctx.stroke();
+    }
+}
+
 class BoostPad {
     constructor(x, y, length = 10.0, width = 2.2) {
         this.type = 'boost';
@@ -678,6 +761,15 @@ for (const pad of boostPads) {
     EM.add(pad);
 }
 
+const obstacle = [
+    new Obstacle(6.8, 18),
+    new Obstacle(8.5, 32)
+]
+
+for(const obs of obstacle){
+    EM.add(obs);
+}
+
 let score = 0;
 let lastScoreTime = Date.now();
 let isGameOver = false;
@@ -754,6 +846,10 @@ function gameLoop() {
 
     for (const pad of boostPads) {
         pad.update(scrollSpeed);
+    }
+
+    for(const obs of obstacle){
+        obs.update(scrollSpeed);
     }
 
     playerVehicle.update();
