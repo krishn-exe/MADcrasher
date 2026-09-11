@@ -282,7 +282,7 @@ class Vehicle {
         this.accelerationRate = 0.007;
         this.decelerationRate = 0.003;
         this.speed = this.baseSpeed;
-        this.width = 1;
+        this.width = 0.5;
         this.length = 1.5;
         this.height = 1;
 
