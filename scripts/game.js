@@ -903,6 +903,29 @@ function gameLoop() {
 
     playerVehicle.isOnBoostPad = collisions.playerWithBoosts.length > 0;
 
+     if (!playerVehicle.isDestroyed) {
+        const px = playerVehicle.x + playerVehicle.width / 2;
+        const py = playerVehicle.y + playerVehicle.length / 2;
+        for (const obs of obstacle){
+            const ox = obs.x + obs.width / 2;
+            const oy = obs.y + obs.length / 2;
+            const dx = Math.abs(px - ox);
+            const dy = Math.abs(py - oy);
+            
+            if (dx < 0.85 && dy < 1.0){
+                const barricadeTopZ = obs.z+obs.height;
+                
+                if (playerVehicle.z > barricadeTopZ) {
+                    
+                }else{
+                    playerVehicle.destroy();
+                    obs.respawn();
+                    break;
+                }
+            }
+        }
+    }
+
     RD.render(EM.entities);
     IM.update();
 
