@@ -22,12 +22,15 @@
       <form action ="game.html" method="get" id="gameLauncherForm">
       <h2>Player Name</h2>
       <input type="text" id="playerName" name="player-name" placeholder="Enter your name" required>
+      <h2>Choose Map</h2>
+      <select name="background" id="backgroundSelect">
+        <option value="background-1">Concrete</option>
+        <option value="background-2">Astra</option>
+        <option value="background-3">Fission</option>
+      </select>
+      <button id="startGameBtn"><a href = instructions.html>Instructions</a></button>
       <button id="startGameBtn" type="submit">Start Game</button>
       </form>
-      <h2>Instructions</h2>
-      <p> Steering : A/D or Arrow keys</p>
-      <p> Jump : Spacebar</p>
-      <p> Shoot : Z or E</p>
     </div>
     <div class = "high-score">
       <h2>High Scores</h2>

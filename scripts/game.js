@@ -17,9 +17,24 @@ const IM = new InputManager();
 const RD = new Renderer(ctx);
 const EM = new EntityManager();
 
+const playerSpriteImg = new Image();
+playerSpriteImg.src = 'assets/player-sprites.png';
+let isplayerSpriteLoaded = false;
+playerSpriteImg.onload = () => {
+    isplayerSpriteLoaded = true;
+};
+
+const enemySpriteImg = new Image();
+enemySpriteImg.src = 'assets/enemy.png';
+let isEnemySpriteLoaded = false;
+enemySpriteImg.onload = () => {
+    isEnemySpriteLoaded = true;
+}
+
 const urlParams = new URLSearchParams(window.location.search);
 const playerName = urlParams.get('player-name') || localStorage.getItem('currentPlayer') || 'Player';
 localStorage.setItem('currentPlayer', playerName);
+const mapName = urlParams.get('background') || 'background-1';
 
 
 function createBikeSprite() {
@@ -230,7 +245,7 @@ function createDestroyedEnemySprite() {
 const destroyedEnemySprite = createDestroyedEnemySprite();
 
 class ParallaxBackground {
-    constructor(imageSrc = 'assets/background.png') {
+    constructor(imageSrc = 'assets/background-2.png') {
         this.type = 'background';
         this.z = -999999;
         this.x = 0;
@@ -280,7 +295,7 @@ class ParallaxBackground {
         }
 
         const aspect = this.image.naturalWidth / this.image.naturalHeight;
-        const tileHeight = Math.max(canvas.height, 600);
+        const tileHeight = canvas.height*1.5;
         const tileWidth = tileHeight * aspect;
 
         const startX = (((this.scrollX + this.steerOffset) % tileWidth) + tileWidth) % tileWidth - tileWidth;
@@ -401,6 +416,7 @@ class Vehicle {
         this.groundZ= 5;
         this.vz= 0;
         this.isJumping = false;
+        this.currentFrame = 2;
 
         this.bullets = [];
         this.shootCoolDown = 0;
@@ -457,10 +473,13 @@ class Vehicle {
         if (this.type === 'player') {
             if (IM.isDown('KeyA') || IM.isDown('ArrowLeft')) {
                 this.x += this.speed;
+                
             }
             if (IM.isDown('KeyD') || IM.isDown('ArrowRight')) {
                 this.x -= this.speed;
+                
             }
+            
             if(IM.isDown('Space') && !this.isJumping){
                 this.isJumping = true;
                 this.vz=4;
@@ -470,11 +489,24 @@ class Vehicle {
                 this.z = this.z+this.vz;
                 this.vz = this.vz-0.08;
 
+                if(this.vz > 2.0){
+                    this.currentFrame = 4;
+                }else if(this.vz > 1.0){
+                    this.currentFrame = 3;
+                }else if(this.vz > -0.5){
+                    this.currentFrame = 2;
+                }else{
+                    this.currentFrame = 1;
+                }
+
                 if(this.z <= this.groundZ){
                     this.z = this.groundZ;
                     this.vz=0;
                     this.isJumping=false;
+                    this.currentFrame = 0;
                 }
+            }else{
+                this.currentFrame = 0;
             }
 
             if(this.shootCoolDown > 0){
@@ -530,15 +562,37 @@ class Vehicle {
             ctx.restore();
         }
 
-       const currentSprite = this.isDestroyed ? destroyedBikeSprite : bikeSprite;
+       if(this.isDestroyed){
+        ctx.drawImage(
+            destroyedBikeSprite,
+            center.x - spriteWidth /2,
+            center.y - 25,
+            spriteWidth,
+            spriteHeight
+        );
+       }else if(isplayerSpriteLoaded){
+        const frameWidth = 1030;
+        const frameHeight = 1045;
+        const sx = this.currentFrame * frameWidth;
+        const sy = 0;
+        const renderWidth = 105;
+        const renderHeight = 106;
 
-       ctx.drawImage(
-        currentSprite,
-        center.x - spriteWidth/2,
-        center.y - 25,
-        spriteWidth,
-        spriteHeight
-       );
+        ctx.drawImage(
+            playerSpriteImg,
+            sx, sy, frameWidth, frameHeight,
+            center.x - renderWidth /2, center.y - 50,
+            renderWidth, renderHeight
+        );
+       }else{
+        ctx.drawImage(
+            bikeSprite,
+            center.x - spriteWidth / 2,
+            center.y - 25,
+            spriteWidth,
+            spriteHeight
+        );
+       }
 
         for (const b of this.bullets) {
             b.draw(ctx);
@@ -606,15 +660,39 @@ class Enemy {
         const spriteWidth = 105;
         const spriteHeight = 78;
 
-        const currentSprite = this.isDestroyed ? destroyedEnemySprite : enemySprite;
+       if(this.isDestroyed){
+        ctx.drawImage(
+            destroyedEnemySprite,
+            center.x -spriteWidth/2,
+            center.y - 25,
+            spriteWidth,
+            spriteHeight
+        )
+       }else if(isEnemySpriteLoaded){
+        const sx = 672;
+        const sy = 176;
+        const sWidth = 1496;
+        const sHeight = 1224;
+        const renderWidth = 115;
+        const renderHeight = 94;
 
         ctx.drawImage(
-            currentSprite,
-            center.x - spriteWidth / 2,
+            enemySpriteImg,
+            sx, sy,
+            sWidth, sHeight,
+            center.x - renderWidth/2, center.y - 45,
+            renderWidth, renderHeight
+
+        );
+     }else{
+        ctx.drawImage(
+            enemySprite,
+            center.x - spriteWidth/2,
             center.y - 25,
             spriteWidth,
             spriteHeight
         );
+     }
     }
 
 }
@@ -696,7 +774,7 @@ class BoostPad {
 const Boost = BoostPad;
 const boosts = BoostPad;
 
-const parallaxBg = new ParallaxBackground('assets/background.png');
+const parallaxBg = new ParallaxBackground(`assets/${mapName}.png`);
 EM.add(parallaxBg);
 
 const roadSegments = [
