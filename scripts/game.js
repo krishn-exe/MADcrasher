@@ -465,14 +465,13 @@ class Vehicle {
         if (this.type === 'player') {
             if (IM.isDown('KeyA') || IM.isDown('ArrowLeft')) {
                 this.x += this.speed;
-                this.currentFrame = 0;
+                
             }
             if (IM.isDown('KeyD') || IM.isDown('ArrowRight')) {
                 this.x -= this.speed;
-                this.currentFrame = 4;
-            }else{
-                this.currentFrame = 2;
+                
             }
+            
             if(IM.isDown('Space') && !this.isJumping){
                 this.isJumping = true;
                 this.vz=4;
@@ -482,11 +481,24 @@ class Vehicle {
                 this.z = this.z+this.vz;
                 this.vz = this.vz-0.08;
 
+                if(this.vz > 2.0){
+                    this.currentFrame = 4;
+                }else if(this.vz > 1.0){
+                    this.currentFrame = 3;
+                }else if(this.vz > -0.5){
+                    this.currentFrame = 2;
+                }else{
+                    this.currentFrame = 1;
+                }
+
                 if(this.z <= this.groundZ){
                     this.z = this.groundZ;
                     this.vz=0;
                     this.isJumping=false;
+                    this.currentFrame = 0;
                 }
+            }else{
+                this.currentFrame = 0;
             }
 
             if(this.shootCoolDown > 0){
