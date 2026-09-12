@@ -31,6 +31,16 @@ enemySpriteImg.onload = () => {
     isEnemySpriteLoaded = true;
 }
 
+const fallSpriteImg = new Image();
+fallSpriteImg.src = 'assets/fall-sprites.png';
+let isFallSpriteLoaded = false;
+fallSpriteImg.onload = () => {
+    isFallSpriteLoaded = true;
+};
+if(fallSpriteImg.complete && fallSpriteImg.naturalWidth > 0){
+    isFallSpriteLoaded = true;
+};
+
 const urlParams = new URLSearchParams(window.location.search);
 const playerName = urlParams.get('player-name') || localStorage.getItem('currentPlayer') || 'Player';
 localStorage.setItem('currentPlayer', playerName);
@@ -298,6 +308,10 @@ class Vehicle {
         this.destroyFrames = 30;
         this.destroyTimer = 0;
 
+        this.isFalling = false;
+        this.fallTimer = 0;
+        this.fallFrame = 0;
+
         this.lives = 3;
 
         this.isOnBoostPad = false;
@@ -310,6 +324,20 @@ class Vehicle {
         this.lives--;
         const crashSound = document.getElementById('crashSound');
         if (crashSound) {
+            crashSound.currentTime = 0;
+            crashSound.play().catch(() => {});
+        }
+    }
+
+    fall(){
+        if(this.isFalling || this.isDestroyed) return;
+
+        this.isFalling = true;
+        this.fallTimer = 35;
+        this.lives--;
+
+        const crashSound = document.getElementById('crashSound');
+        if(crashSound){
             crashSound.currentTime = 0;
             crashSound.play().catch(() => {});
         }
@@ -336,6 +364,41 @@ class Vehicle {
             }
             return;
         }
+
+            
+        if (this.isFalling) {
+           
+            const progress = 1.0 - (this.fallTimer / 35);
+
+            this.fallFrame = Math.min(4, Math.floor(progress * 5));
+
+           
+            this.z -= 0.6;
+
+            this.fallTimer--;
+
+            if (this.fallTimer <= 0) {
+                this.isFalling = false;
+
+                if (this.lives <= 0) {
+                    triggerGameOver();
+                    return;
+                }
+
+              
+                this.x = 6.5;
+                this.y = 4;
+                this.z = this.groundZ;
+                this.vz = 0;
+                this.isJumping = false;
+                this.isOnBoostPad = false;
+                this.speed = this.baseSpeed;
+                this.currentFrame = 2; // Level riding stance
+            }
+
+            return;
+        }
+
 
         if (this.isOnBoostPad) {
             this.speed = Math.min(this.maxSpeed, this.speed + this.accelerationRate);
@@ -443,7 +506,27 @@ class Vehicle {
             spriteWidth,
             spriteHeight
         );
-       }else if(isplayerSpriteLoaded){
+       }else if(this.isFalling && isFallSpriteLoaded){
+
+        const frameWidth = 1040;
+        const frameHeight = 1045;
+        const sx = (this.fallFrame || 0)*frameWidth;
+        const sy = 0;
+        const renderWidth = 105;
+        const renderHeight = 106;
+
+        ctx.drawImage(
+            
+            fallSpriteImg,
+            sx, sy, frameWidth, frameHeight,            
+            center.x - renderWidth / 2, center.y - 50,  
+            renderWidth, renderHeight                   
+        );
+
+       }
+       
+       
+       else if(isplayerSpriteLoaded){
         const frameWidth = 1030;
         const frameHeight = 1045;
         const sx = this.currentFrame * frameWidth;
@@ -896,8 +979,8 @@ function gameLoop() {
         }
     }
 
-    if (!isOnRoad && !playerVehicle.isJumping && !playerVehicle.isDestroyed) {
-        playerVehicle.destroy();
+    if (!isOnRoad && !playerVehicle.isJumping && !playerVehicle.isDestroyed && !playerVehicle.isFalling) {
+        playerVehicle.fall();
     }
 
     const collisions = EM.getCollisions();
