@@ -480,6 +480,10 @@ class Enemy {
         this.height = 1;
         this.speed = 0.04;
 
+        this.weaveAngle = Math.random() * Math.PI * 2;
+        this.weaveSpeed = 0.04;
+        this.weaveAmplitude = 0.035;
+
         this.isDestroyed = false;
         this.destroyFrames = 30;
         this.destroyTimer = 0;
@@ -505,6 +509,11 @@ class Enemy {
         }
 
         this.y -= (this.speed + scrollSpeed);
+
+        this.weaveAngle = this.weaveAngle + this.weaveSpeed;
+        this.x = this.x + Math.sin(this.weaveAngle) + this.weaveAmplitude;
+
+        this.x = Math.max(5.8, Math.min(10.5, this.x));
 
         if (this.y < -2) {
             this.respawn();
